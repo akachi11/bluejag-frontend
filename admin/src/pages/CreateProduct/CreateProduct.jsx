@@ -131,9 +131,9 @@ const CreateProduct = () => {
         }
     }
 
-    useEffect(() => {
-        // getProducts()
-    })
+    // useEffect(() => {
+    //     // getProducts()
+    // })
 
     return (
         <CreateProductContainer>
