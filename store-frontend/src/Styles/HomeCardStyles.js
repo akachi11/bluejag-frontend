@@ -21,7 +21,7 @@ export const HomeCardLogo = styled.div`
     margin-bottom: 1rem;
 
     @media only screen and (${devices.tablet}) {
-        width: 20%;
+        width: 6rem;
     }
 
     img {
@@ -34,6 +34,10 @@ export const HomeCardHeader = styled.p`
     font-size: 2.2rem;
     line-height: 2rem;
     text-align: center;
+
+    @media only screen and (${devices.laptop}) {
+        font-size: 2.5rem;
+    }
 `;
 
 export const HomeCardFlexbox = styled.div`
@@ -46,6 +50,11 @@ export const HomeCardFlexbox = styled.div`
     @media only screen and (${devices.tablet}) {
         flex-direction: row;
         justify-content: space-between;
+    }
+
+
+    @media only screen and (${devices.laptop}) {
+        padding: 0 5rem;
     }
 `;
 
@@ -60,4 +69,8 @@ export const HomeCardSubheader = styled.p`
 
 export const HomeCardText = styled.p`
     font-weight: 500;
+
+    @media only screen and (${devices.laptop}) {
+        font-size: .9rem;
+    }
 `;

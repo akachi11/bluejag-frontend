@@ -104,6 +104,8 @@ export const NewArrivalItemImgBg = styled.div`
 export const NewArrivalItemImg = styled.img`
   position: absolute;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
 
   @media only screen and (min-width: 600px) {
     width: 50%;

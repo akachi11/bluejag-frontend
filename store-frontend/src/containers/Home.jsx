@@ -8,6 +8,7 @@ import { useHomeContext } from "../context/HomeContext";
 import HomeCard from "../components/HomeCard";
 import WearsSlides from "../components/WearsSlides";
 import Announcement from "../components/Announcement";
+import HomeReview from "../components/HomeReview";
 
 const Home = () => {
 
@@ -19,6 +20,7 @@ const Home = () => {
         <NewArrivals />
         <HomeCard />
         <WearsSlides />
+        <HomeReview />
         <Footer />
     </HomeContainer>
   );

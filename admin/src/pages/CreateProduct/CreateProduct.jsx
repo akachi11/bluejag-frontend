@@ -38,6 +38,9 @@ const CreateProduct = () => {
     const [subDesc, setSubDesc] = useState("")
     const [descTitle, setDescTitle] = useState("")
     const [desc, setDesc] = useState("")
+    const [price, setPrice] = useState("")
+    const [discount, setDiscount] = useState("")
+    const [color, setColor] = useState("")
 
     const genders = ["Male", "Female"]
 
@@ -101,27 +104,27 @@ const CreateProduct = () => {
         descImgRef.current.click();
     };
 
-    const getProducts = async () => {
+    const createProduct = async () => {
         try {
             await axios.post("http://localhost:5000/api/product/new-product",
                 {
-                    name: "Sleeveless",
-                    subDesc: "test",
-                    price: 500,
-                    color: "red",
-                    size: "XL",
-                    units: 3,
-                    descriptionImage: "test",
-                    images: ["test", "test"],
-                    limitedEdition: true,
+                    name: name,
+                    subDesc: subDesc,
+                    price: price,
+                    color: color,
+                    size: selectedSize,
+                    units: units,
+                    descriptionImage: descImg?.base64,
+                    images: images,
+                    limitedEdition: isLimitedEdition,
                     description: {
-                        title: "test",
-                        desc: "test"
+                        title: descTitle,
+                        desc: desc
                     },
-                    details: ["test", "test"],
-                    gender: "Male",
-                    categories: ["test", "test"],
-                    materials: ["test", "test"]
+                    details: selectedDetails,
+                    gender: gender,
+                    categories: selectedCategories,
+                    materials: selectedMaterials
                 }
             ).then((res) => {
                 console.log(res)
@@ -144,33 +147,38 @@ const CreateProduct = () => {
             <ProductForm>
                 <ProductFormField darkMode={darkMode}>
                     <label>Product Name</label>
-                    <input type="text" placeholder='e.g Extra-Mile Aero Sleeveless' name="" id="" />
+                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder='e.g Extra-Mile Aero Sleeveless' name="" id="" />
                 </ProductFormField>
 
                 <ProductFormField darkMode={darkMode}>
                     <label>Sub Description</label>
-                    <input type="text" placeholder='e.g Extra-Mile Aero Sleeveless' name="" id="" />
+                    <input type="text" value={subDesc} onChange={(e) => setSubDesc(e.target.value)} placeholder='e.g Extra-Mile Aero Sleeveless' name="" id="" />
                 </ProductFormField>
 
                 <ProductFormField darkMode={darkMode}>
                     <label>Description Title</label>
-                    <input type="text" placeholder='Enter description title' name="" id="" />
+                    <input type="text" value={descTitle} onChange={(e) => setDescTitle(e.target.value)} placeholder='Enter description title' name="" id="" />
                 </ProductFormField>
 
                 <ProductFormField darkMode={darkMode}>
                     <label>Description</label>
-                    <textarea rows={10} placeholder='Enter product description' />
+                    <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={10} placeholder='Enter product description' />
+                </ProductFormField>
+
+                <ProductFormField darkMode={darkMode}>
+                    <label>Color</label>
+                    <input type="text" value={color} onChange={(e) => setColor(e.target.value)} placeholder='Enter description title' name="" id="" />
                 </ProductFormField>
 
                 <DualColumn>
                     <ProductFormField darkMode={darkMode}>
                         <label>Price</label>
-                        <input type="text" placeholder='e.g 500' name="" id="" />
+                        <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} placeholder='e.g 500' name="" id="" />
                     </ProductFormField>
 
                     <ProductFormField darkMode={darkMode}>
                         <label>Discount (%)</label>
-                        <input type="text" placeholder='e.g 5' name="" id="" />
+                        <input type="text" value={discount} onChange={(e) => setDiscount(e.target.value)} placeholder='e.g 5' name="" id="" />
                     </ProductFormField>
                 </DualColumn>
 
@@ -415,7 +423,7 @@ const CreateProduct = () => {
             </ProductForm>
 
             <PageHeader>
-                <button className='submit'>Submit</button>
+                <button className='submit' onClick={createProduct}>Submit</button>
             </PageHeader>
 
             <ImageInput

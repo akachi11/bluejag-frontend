@@ -4,6 +4,10 @@ import { devices } from "../responsiveness";
 
 export const WearsSlidesContainer = styled.div`
   margin: 1rem;
+
+  @media only screen and (${devices.laptop}) {
+    padding: 0 7rem;
+  }
 `;
 
 export const StylesFlexbox = styled.div`
@@ -57,7 +61,7 @@ export const StylesItem = styled.div`
     min-width: auto;
 
     @media only screen and (min-height: 1366px) {
-        height: 40vw;
+      height: 40vw;
     }
   }
 `;
@@ -85,7 +89,7 @@ export const StylesTextTop = styled.p`
   font-family: "Poppins", sans-serif;
   font-weight: 700;
   font-size: 0.9rem;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 `;
 
 export const StylesTextDesc = styled.p`
@@ -93,11 +97,11 @@ export const StylesTextDesc = styled.p`
   font-weight: 900;
   font-size: 1.3rem;
   line-height: 1.7rem;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
 `;
 
 export const StylesItemLink = styled.p`
   font-family: "Montserrat", sans-serif;
-  font-size: .8rem;
+  font-size: 0.8rem;
   text-decoration: underline;
 `;
