@@ -5,7 +5,7 @@ import { devices } from "../responsiveness";
 export const WearsSlidesContainer = styled.div`
   margin: 1rem;
 
-  @media only screen and (${devices.laptop}) {
+  @media only screen and (${devices.laptopLarge}) {
     padding: 0 7rem;
   }
 `;

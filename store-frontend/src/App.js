@@ -1,13 +1,15 @@
-import { useContext } from "react";
-import Home from "./containers/Home";
-import "./fonts/fonts.css"
-import { useHomeContext } from "./context/HomeContext";
+import "./fonts/fonts.css";
+import ProductPage from "./containers/ProductPage";
+import Announcement from "./components/Announcement";
+import Navbar from "./components/Navbar";
 
 function App() {
-
   return (
     <>
-      <Home />
+      <Announcement />
+      <Navbar />
+      {/* <Home /> */}
+      <ProductPage />
     </>
   );
 }

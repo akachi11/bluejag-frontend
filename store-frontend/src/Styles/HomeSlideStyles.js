@@ -22,16 +22,23 @@ export const BodyHeaderOne = styled.div`
   font-weight: 900;
   font-size: 1.2rem;
   color: ${themeColors.mainBlue};
+  text-transform: uppercase;
 `;
 
 export const NewArrivalsFlexbox = styled.div`
   display: flex;
-  overflow-x: scroll;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  will-change: transform;
   margin: 0.5rem 0 1rem;
   gap: 1rem;
   scroll-snap-type: inline mandatory;
-  padding: 0 3rem 1rem;
+  padding-bottom: 1rem;
   justify-content: space-between;
+
+  &:active {
+    cursor: grabbing;
+  }
 
   &::-webkit-scrollbar {
     display: none;
@@ -44,7 +51,7 @@ export const NewArrivalItem = styled.div`
   position: relative;
   min-width: 35vw;
 
-  &:first-child {
+  /* &:first-child {
     scroll-snap-align: start;
   }
 
@@ -54,7 +61,7 @@ export const NewArrivalItem = styled.div`
 
   &:last-child {
     scroll-snap-align: end;
-  }
+  } */
 
   @media only screen and (min-width: 600px) {
     min-width: 27%;
@@ -65,7 +72,7 @@ export const NewArrivalItem = styled.div`
   }
 
   @media only screen and (${devices.laptop}) {
-    min-width: 21vw;
+    min-width: 15vw;
   }
 `;
 
@@ -104,7 +111,6 @@ export const NewArrivalItemImgBg = styled.div`
 export const NewArrivalItemImg = styled.img`
   position: absolute;
   width: 100%;
-  height: 100%;
   object-fit: cover;
 
   @media only screen and (min-width: 600px) {
@@ -116,7 +122,7 @@ export const NewArrivalItemImg = styled.img`
   }
 
   @media only screen and (${devices.laptop}) {
-    width: 80%;
+    width: 70%;
   }
 
   @media only screen and (${devices.laptopLarge}) {

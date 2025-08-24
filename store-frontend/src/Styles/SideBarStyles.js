@@ -30,7 +30,7 @@ export const SideBarContainer = styled.div`
   z-index: 9;
   transform: translateX(-100%);
   height: 100vh;
-  overflow: scroll;
+  overflow: auto;
 
   &.closed {
     transform: translateX(-100%);
@@ -77,6 +77,7 @@ export const SideBarMainLink = styled.div`
   justify-content: space-between;
   align-items: center;
   font-weight: 500;
+  color: ${themeColors.mainBlue};
 
   &.last-call {
     color: ${themeColors.lastCallRed};

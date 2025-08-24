@@ -68,8 +68,8 @@ export const HeroSubText = styled.p`
 `;
 
 export const HeroButton = styled.button`
-  color: ${themeColors.mainBlue};
-  background-color: white;
+  color: ${props => props.color};
+  background-color: ${props => props.bg};
   width: 100%;
   padding: 1rem;
   border-radius: 5px;

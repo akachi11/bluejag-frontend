@@ -2,17 +2,17 @@ import React from "react";
 import {
   HRCButton,
   HRCComment,
+  HRCFind,
   HRCFirst,
   HRCRater,
   HRCSecond,
-  HRCStars,
   HomeReviewContainer,
 } from "../Styles/HomeReviewStyles";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import { Img } from "../StaticStyle";
 import img from "../assets/Shirts/shirt10.webp";
 
-const HomeReview = () => {
+const HomeReview2 = () => {
   const rating = 4.5;
 
   const fullStars = Math.floor(rating);
@@ -28,21 +28,19 @@ const HomeReview = () => {
 
   return (
     <HomeReviewContainer>
-      <HRCFirst>
-        <HRCStars>{stars}</HRCStars>
-
-        <HRCComment>"It was easy to see they're built to last."</HRCComment>
-
-        <HRCRater>- Joe C.</HRCRater>
-
-        <HRCButton>Shop Wears</HRCButton>
-      </HRCFirst>
-
       <HRCSecond>
         <Img src={img} />
       </HRCSecond>
+
+      <HRCFirst>
+        <HRCComment>WORK OUT IN STYLE</HRCComment>
+
+        <HRCRater className="text">Our stores are a feast for the senses – the smell of leather, a friendly smile, free boot shines, and a cool beverage to enjoy while you take it all in. Come see us, friends!</HRCRater>
+      
+        <HRCFind>Find Your Store</HRCFind>
+      </HRCFirst>
     </HomeReviewContainer>
   );
 };
 
-export default HomeReview;
+export default HomeReview2;
