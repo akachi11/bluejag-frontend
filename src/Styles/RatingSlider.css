@@ -1,0 +1,10 @@
+/* Custom styling for slider mark texts */
+.rc-slider-mark-text {
+  display: none;
+}
+
+/* Optional: Customize slider marks container */
+.rc-slider-mark {
+  display: flex;
+  justify-content: space-between;
+}

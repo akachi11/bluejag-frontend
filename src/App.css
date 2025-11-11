@@ -1,0 +1,73 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Anton&display=swap");
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+@import "tailwindcss";
+
+@keyframes icon-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+.animate-icon-pulse {
+  animation: icon-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.15s ease-out forwards;
+}
+
+* {
+  .montserrat {
+    font-family: "Montserrat", sans-serif;
+  }
+}
+body {
+  .montserrat {
+    font-family: "Montserrat", sans-serif;
+  }
+
+  .anton {
+    font-family: "Anton", sans-serif;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE & Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+/* Fix slick overflow issue */
+.slick-list {
+  overflow: hidden !important;
+}
+.slick-track {
+  display: flex !important;
+}
+body {
+  overflow-x: hidden;
+}
