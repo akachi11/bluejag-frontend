@@ -13,7 +13,6 @@ import {
   ProductKey,
   ProductNamePrice,
   ProductPageContainer,
-  ProductRating,
   ProductSize,
   ProductTop,
   ProductValue,
@@ -23,25 +22,17 @@ import {
   SizeTop,
   SizesFlexbox,
 } from "../Styles/ProductPage";
-import { HRCStars } from "../Styles/HomeReviewStyles";
-import { stars } from "../utils";
-import img1 from "../assets/Shirts/shirt10.webp";
-import img2 from "../assets/Shirts/shirt11.webp";
-import img3 from "../assets/Shirts/shirt12.webp";
 import ImageSlider from "../components/ImagesSlider";
 import { GoBookmarkSlash } from "react-icons/go";
 import { GoBookmarkFill } from "react-icons/go";
 import { IconContainer } from "../Styles/ComponentStyles";
 import { SpecialInfo } from "../Styles/HomeSlideStyles";
-import { themeColors } from "../Themes/themeColors";
 import BigButton from "../components/BigButton";
 import { LiaPlusSolid, LiaMinusSolid } from "react-icons/lia";
 import GoinBlue from "../components/GoinBlue";
 import HomeSlide from "../components/NewArrivals";
-import RatingSummary from "../components/RatingSummary";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { useUserContext } from "../context/UserContext";
 import { useCart } from "../context/CartContext";
 import { localHost, renderAPI } from "../constants";
 

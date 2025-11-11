@@ -16,8 +16,8 @@ import {
 } from "../Styles/FooterStyles";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
 import { Div, Img, Paragraph } from "../StaticStyle";
-import male from "../assets/Jeans/Male/Premium jeans/Light wash/jean1.webp";
-import female from "../assets/Jeans/Female/Medium blue wash/jean19.webp";
+import male from "../assets/goinblue5.jpeg";
+import female from "../assets/Female/review.jpeg";
 import { useHomeContext } from "../context/HomeContext";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
