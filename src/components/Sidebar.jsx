@@ -17,7 +17,7 @@ import {
 import { MdOutlineArrowRightAlt } from "react-icons/md";
 import { Div, Img, Paragraph } from "../StaticStyle";
 import male from "../assets/Female/hard.jpeg";
-import female from "../assets/Female/femaleHard.jpg";
+import female from "../assets/Female/femaleHard.JPG";
 import { useHomeContext } from "../context/HomeContext";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
