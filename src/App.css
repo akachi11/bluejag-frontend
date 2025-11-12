@@ -71,3 +71,55 @@ body {
 body {
   overflow-x: hidden;
 }
+
+/* global-toast.css */
+
+/* Position bottom-right */
+.Toastify__toast-container {
+  bottom: 1rem !important;
+  right: 1rem !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important; /* allows custom toast width */
+}
+
+/* Toast style */
+.Toastify__toast {
+  background: #0f172a; /* deep blue skeleton base */
+  color: #f4f4f4; /* light text */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  max-width: 350px; /* max width on desktop */
+  width: 50vw; /* mobile width */
+  overflow: hidden;
+}
+
+/* Toast progress bar */
+.Toastify__progress-bar {
+  background: #1e293b; /* skeleton shimmer color */
+}
+
+/* Slide in animation from bottom-right */
+.Toastify__slide-enter {
+  transform: translateX(100%) translateY(0);
+}
+.Toastify__slide-enter-active {
+  transform: translateX(0) translateY(0);
+  transition: transform 0.5s ease;
+}
+.Toastify__slide-exit {
+  transform: translateX(0) translateY(0);
+}
+.Toastify__slide-exit-active {
+  transform: translateX(100%) translateY(0);
+  transition: transform 0.5s ease;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .Toastify__toast {
+    width: 50vw; /* 50% of screen on mobile */
+  }
+}

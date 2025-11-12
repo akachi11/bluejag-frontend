@@ -2,6 +2,7 @@ import axios from "axios";
 import { DeleteIcon, EditIcon, PlusIcon } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { localHost, renderAPI } from "../constants";
+import { AddressBookSkeleton } from "./AddressSkeleton";
 
 const nigerianStates = [
   "Abia",
@@ -62,6 +63,7 @@ const AddressBook = () => {
   const [isValid, setIsValid] = useState(false);
   const [addNew, setAddNew] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetchingAddresses, setFetchingAddresses] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [editingAddress, setEditingAddress] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -182,6 +184,7 @@ const AddressBook = () => {
   };
 
   const getAddresses = async (e) => {
+    setFetchingAddresses(true);
     try {
       const response = await axios.get(
         `${
@@ -195,8 +198,10 @@ const AddressBook = () => {
       );
 
       setAddresses(response.data);
+      setFetchingAddresses(false);
       return response.data; // array of addresses
     } catch (err) {
+      setFetchingAddresses(false);
       console.error("Failed to fetch addresses:", err);
     }
   };
@@ -248,7 +253,9 @@ const AddressBook = () => {
     }
   };
 
-  return (
+  return fetchingAddresses ? (
+    <AddressBookSkeleton />
+  ) : (
     <div className="px-4 montserrat md:px-16 lg:px-24">
       <p className="montserrat text-lg font-semibold ">ADDRESS BOOK</p>
       <div className="mt-4 flex flex-col gap-8 md:flex-row md:justify-between">

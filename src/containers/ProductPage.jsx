@@ -36,6 +36,7 @@ import axios from "axios";
 import { useCart } from "../context/CartContext";
 import { localHost, renderAPI } from "../constants";
 import ProductSkeleton from "../components/ProductPageSkeleton";
+import { toast } from "react-toastify";
 
 const ProductPage = () => {
   const [bookmarked, setBookmarked] = useState(false);
@@ -51,6 +52,7 @@ const ProductPage = () => {
   const [images, setImages] = useState([]);
   const [colors, setColors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   const accordionTitles = ["details", "materials", "care", "notes"];
   const { pid } = useParams();
@@ -131,6 +133,11 @@ const ProductPage = () => {
   };
 
   const handleAddToCart = () => {
+    setAddingToCart(true);
+    setTimeout(() => {
+      setAddingToCart(false);
+      toast.success("Added to cart");
+    }, 1000);
     const { color, size, hexCode } = selection;
 
     const itemObj = {
@@ -166,7 +173,7 @@ const ProductPage = () => {
           <DPPInfo>
             <ProductTop>
               <ProductNamePrice>
-                <p className="name uppercase">{product?.name}</p>
+                <p className="name uppercase mr-4">{product?.name}</p>
                 <p className="price">
                   {product?.price.toLocaleString("en-NG", {
                     style: "currency",
@@ -293,8 +300,14 @@ const ProductPage = () => {
             </ProductKey>
 
             <BigButton
-              title={selection.size !== "" ? "ADD TO CART" : "SELECT YOUR SIZE"}
-              disabled={selection.size === ""}
+              title={
+                addingToCart
+                  ? "ADDING TO CART..."
+                  : selection.size !== ""
+                  ? "ADD TO CART"
+                  : "SELECT YOUR SIZE"
+              }
+              disabled={addingToCart || selection.size === ""}
               onClick={handleAddToCart}
             />
 
@@ -326,6 +339,7 @@ const ProductPage = () => {
                             ? setOpenAccordion(undefined)
                             : setOpenAccordion(i)
                         }
+                        className="cursor-pointer"
                       >
                         <p className="capitalize">{title}</p>
                         {openAccordion === i ? (

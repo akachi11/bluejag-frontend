@@ -29,7 +29,7 @@ export const CartProvider = ({ children }) => {
       const res = await axios.post(
         `${
           location.origin.includes("localhost") ? localHost : renderAPI
-        }api/cart/`,
+        }/api/cart/`,
         product,
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -25,7 +25,6 @@ export const ProductNamePrice = styled.div`
   @media only screen and (${devices.tablet}) {
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
     margin-bottom: 0;
   }
 

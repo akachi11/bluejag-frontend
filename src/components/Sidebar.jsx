@@ -16,8 +16,8 @@ import {
 } from "../Styles/FooterStyles";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
 import { Div, Img, Paragraph } from "../StaticStyle";
-import male from "../assets/goinblue5.jpeg";
-import female from "../assets/Female/review.jpeg";
+import male from "../assets/Female/hard.jpeg";
+import female from "../assets/Female/femaleHard.jpg";
 import { useHomeContext } from "../context/HomeContext";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -131,16 +131,16 @@ const Sidebar = () => {
         </SideBarMainLinks>
 
         {/* PRE-ORDER SECTION */}
-        <SideBarFlexbox>
-          <SideBarFlexboxItem>
-            <Img src={male} />
+        <div className="flex text-center">
+          <div className="flex-1">
+            <img className="w-[90%] m-auto rounded-lg" src={male} />
             <Paragraph>MEN'S PRE ORDER</Paragraph>
-          </SideBarFlexboxItem>
-          <SideBarFlexboxItem>
-            <Img src={female} />
+          </div>
+          <div className="flex-1">
+            <img className="w-[90%] m-auto rounded-lg" src={female} />
             <Paragraph>WOMEN'S PRE ORDER</Paragraph>
-          </SideBarFlexboxItem>
-        </SideBarFlexbox>
+          </div>
+        </div>
 
         {/* FOOTER */}
         <SideBarFooter className="bg-gray-950">

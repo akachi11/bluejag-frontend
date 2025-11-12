@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import { MdOutlineFavorite, MdOutlineFavoriteBorder } from "react-icons/md";
 import { RiShoppingBag4Fill, RiShoppingBag4Line } from "react-icons/ri";
-import img from "../assets/Female/Red-core-twoPc.JPG";
+import img from "../assets/Female/femaleHard.JPG";
 import { themeColors } from "../Themes/themeColors";
 import { Trash2 } from "lucide-react";
 import { useCart } from "../context/CartContext";
