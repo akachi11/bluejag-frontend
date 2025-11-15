@@ -20,8 +20,9 @@ import TermsPage from "./containers/Terms";
 import PrivacyPage from "./containers/Privacy";
 import Profile from "./containers/Profile";
 import Orders from "./containers/Orders";
-import OrderPage from "./containers/OrderPage";
 import AddressBook from "./containers/AddressBook";
+import OrderDetails from "./containers/OrderDetail";
+import Loyalty from "./containers/Loyalty";
 
 function App() {
   const { isCartOpen, toggleCart, setLoggedIn, loggedIn, sideBarOpen } =
@@ -63,12 +64,14 @@ function App() {
 
       <main className="grow">
         <Routes>
+          {/* <Route path="/" element={<Home />} /> */}
           <Route path="/" element={<Home />} />
           <Route path="/account" element={<Profile />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/loyalty-overview" element={<Loyalty />} />
           <Route path="/addresses" element={<AddressBook />} />
           <Route path="/category/:cat" element={<CategoryPage />} />
-          <Route path="/order/:oid" element={<OrderPage />} />
+          <Route path="/order/:oid" element={<OrderDetails />} />
           <Route path="/product/:pid" element={<ProductPage />} />
 
           {/* Redirect logged-in users away from auth pages */}
@@ -94,6 +97,8 @@ function App() {
 
       {/* Footer */}
       {!hideLayout && <Footer />}
+
+      {/* <div className="bg-blue-500"></div> */}
 
       <ToastContainer />
     </div>

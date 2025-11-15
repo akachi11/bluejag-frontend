@@ -16,6 +16,15 @@
   }
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+  100% {
+    background-position: 600px 0;
+  }
+}
+
 .animate-icon-pulse {
   animation: icon-pulse 1.5s infinite ease-in-out;
 }
@@ -120,6 +129,6 @@ body {
 /* Mobile adjustments */
 @media (max-width: 640px) {
   .Toastify__toast {
-    width: 50vw; /* 50% of screen on mobile */
+    width: 80vw; /* 50% of screen on mobile */
   }
 }

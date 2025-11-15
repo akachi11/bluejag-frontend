@@ -88,3 +88,52 @@ export const MobileProfileSkeleton = () => {
     </div>
   );
 };
+
+export const DesktopProfileSkeleton = () => {
+  return (
+    <div className="hidden lg:flex justify-between bg-gray-950 montserrat px-12 xl:px-32 pt-8">
+      {/* Left section */}
+      <div className="flex-1 flex flex-col gap-4">
+        {/* Name */}
+        <SkeletonText width="50%" height="1rem" />
+        <SkeletonText width="50%" height="1rem" />
+
+        {/* Buttons */}
+        <div className="mt-4 flex flex-col gap-1">
+          <SkeletonBox width="100%" height="2.5rem" />
+          <SkeletonBox width="100%" height="2.5rem" />
+          <SkeletonBox width="100%" height="2.5rem" />
+        </div>
+      </div>
+
+      {/* Middle section */}
+      <div className="flex-2 mx-12 flex flex-col items-center">
+        {/* XP number */}
+        <div className="mt-4 w-fit relative">
+          <SkeletonText width="6rem" height="5rem" />
+          <SkeletonText width="2rem" height="1rem" mt="0.5rem" />
+        </div>
+
+        {/* XP Progress */}
+        <div className="w-full max-w-md mt-2">
+          <SkeletonBox width="100%" height="0.25rem" radius="999px" />
+        </div>
+
+        {/* Tier image */}
+        <div className="mt-8 h-40 xl:h-60 w-full flex justify-center overflow-hidden">
+          <SkeletonBox width="30%" height="200px" radius="12px" />
+        </div>
+      </div>
+
+      {/* Right section */}
+      <div className="flex-1 flex flex-col gap-2">
+        <SkeletonText width="50%" height="1rem" />
+        <div className="mt-4 flex flex-col gap-1">
+          <SkeletonBox width="100%" height="2.5rem" />
+          <SkeletonBox width="100%" height="2.5rem" />
+          <SkeletonBox width="100%" height="2.5rem" />
+        </div>
+      </div>
+    </div>
+  );
+};

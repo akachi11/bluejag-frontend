@@ -54,7 +54,6 @@ export const NavbarContainer = styled.div`
   color: white;
   position: sticky;
   top: 0;
-  z-index: 3;
   overflow: hidden;
   height: 5rem;
   display: flex;
@@ -74,7 +73,7 @@ export const NavbarBox = styled.div`
     padding: 1rem 2rem;
   }
 
-  @media only screen and (${devices.laptop}) {
+  @media only screen and (${devices.laptopLarge}) {
     padding: 1rem 4rem;
   }
 `;

@@ -40,7 +40,7 @@ const Sidebar = () => {
       <SideBarContainer
         className={`${
           sideBarOpen ? "open" : ""
-        } bg-gray-900 text-white transition-all duration-300`}
+        } bg-gray-900 text-white transition-all w-full md:w-fit duration-300`}
       >
         <div
           className="w-full flex justify-end p-4 pb-0 cursor-pointer"
@@ -128,19 +128,11 @@ const Sidebar = () => {
           <SideBarMainLink className="last-call">
             <Paragraph>LAST CALL</Paragraph>
           </SideBarMainLink>
-        </SideBarMainLinks>
 
-        {/* PRE-ORDER SECTION */}
-        <div className="flex text-center">
-          <div className="flex-1">
-            <img className="w-[90%] m-auto rounded-lg" src={male} />
-            <Paragraph>MEN'S PRE ORDER</Paragraph>
-          </div>
-          <div className="flex-1">
-            <img className="w-[90%] m-auto rounded-lg" src={female} />
-            <Paragraph>WOMEN'S PRE ORDER</Paragraph>
-          </div>
-        </div>
+          <SideBarMainLink>
+            <Paragraph>PRE ORDER</Paragraph>
+          </SideBarMainLink>
+        </SideBarMainLinks>
 
         {/* FOOTER */}
         <SideBarFooter className="bg-gray-950">

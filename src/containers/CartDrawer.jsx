@@ -68,7 +68,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
           {/* Desktop Drawer */}
           <motion.div
-            className="hidden sm:block fixed z-50 bg-gray-900 h-full right-0 top-0 overflow-y-auto w-[420px] shadow-lg"
+            className="hidden sm:block fixed z-50 bg-gray-950 h-full right-0 top-0 overflow-y-auto w-[420px] shadow-lg"
             variants={desktopVariants}
             initial="hidden"
             animate="visible"

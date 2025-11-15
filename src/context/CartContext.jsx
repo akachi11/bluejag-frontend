@@ -125,6 +125,14 @@ export const CartProvider = ({ children }) => {
     ? cart.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 1), 0)
     : 0;
 
+  const applyDiscount = (discount) => {
+    if (!discount || !discount.discountPercent) return total;
+
+    const discountPercent = discount.discountPercent;
+    const discountedTotal = total - Math.round((total * discountPercent) / 100);
+
+    return discountedTotal;
+  };
   const value = {
     cart,
     total,
@@ -133,6 +141,7 @@ export const CartProvider = ({ children }) => {
     updateqty,
     setCartDirectly,
     clearCart,
+    applyDiscount,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

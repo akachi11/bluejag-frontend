@@ -19,6 +19,7 @@ import { useHomeContext } from "../context/HomeContext";
 import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { User2Icon } from "lucide-react";
+import { useCart } from "../context/CartContext";
 
 const Navbar = () => {
   const iconStyle = {
@@ -27,6 +28,7 @@ const Navbar = () => {
   };
 
   const { sideBarOpen, toggleSideBar, loggedIn, toggleCart } = useHomeContext();
+  const { cart } = useCart();
 
   const navigate = useNavigate();
 
@@ -35,7 +37,7 @@ const Navbar = () => {
   };
 
   return (
-    <NavbarContainer>
+    <NavbarContainer className="z-20">
       <NavbarBox>
         <NavbarMenu>
           <MenuIcon onClick={openSideBar}>
@@ -45,7 +47,7 @@ const Navbar = () => {
               <HiOutlineMenuAlt4 style={iconStyle} />
             )}
           </MenuIcon>
-          <div className="gap-8 hidden lg:flex">
+          <div className="gap-6 hidden lg:flex xl:gap-8">
             <Paragraph
               onClick={() => {
                 navigate("/category/men");
@@ -72,7 +74,7 @@ const Navbar = () => {
           }}
           src={logo}
         />
-        <NavbarMobileRight>
+        <NavbarMobileRight className="relative flex items-center gap-4">
           {loggedIn ? (
             <div
               onClick={() => navigate("/account")}
@@ -93,7 +95,18 @@ const Navbar = () => {
               </div>
             </>
           )}
-          <HiOutlineShoppingCart onClick={toggleCart} style={iconStyle} />
+
+          <div
+            className="relative cursor-pointer hover:text-blue-400"
+            onClick={toggleCart}
+          >
+            <HiOutlineShoppingCart style={iconStyle} />
+            {cart?.length > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {cart.length}
+              </span>
+            )}
+          </div>
         </NavbarMobileRight>
       </NavbarBox>
     </NavbarContainer>

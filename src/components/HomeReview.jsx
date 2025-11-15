@@ -17,29 +17,22 @@ const HomeReview = () => {
   ];
 
   return (
-    <div className="relative w-full h-112 md:h-[40vh] lg:h-[55vh] text-white overflow-hidden">
-      {/* Background image */}
-      <img
-        src={img}
-        alt="review"
-        className="absolute inset-0 w-full h-full object-cover brightness-75 md:brightness-100"
-      />
-      {/* Subtle overlay for readability */}
-      <div className="absolute inset-0 bg-black/30 md:hidden"></div>
+    <div className="relative w-full h-[28rem] md:h-[40vh] lg:h-[55vh] text-white overflow-hidden flex flex-col md:flex-row">
+      {/* Mobile background image */}
+      <div className="absolute inset-0 md:hidden">
+        <img
+          src={img}
+          alt="review"
+          className="w-full h-full object-cover brightness-75"
+        />
+        <div className="absolute inset-0 bg-black/30"></div>
+      </div>
 
-      {/* Text content */}
-      <div
-        className="
-          absolute bottom-6 left-6 z-10
-          flex flex-col items-start justify-end
-          max-w-[45%] sm:max-w-[60%]
-          text-left
-          md:static md:flex md:items-center md:justify-center md:text-center md:w-1/2 md:px-8 md:py-12
-        "
-      >
+      {/* Text section */}
+      <div className="relative z-10 flex h-full flex-col justify-end items-start text-left max-w-[80%] sm:max-w-[60%] px-6 py-10 md:py-12 md:justify-center md:items-center md:text-center md:w-1/2 md:max-w-none">
         <div className="flex text-xl sm:text-2xl mb-2">{stars}</div>
 
-        <p className="font-serif text-sm sm:text-base mb-2 leading-snug">
+        <p className="font-serif text-sm sm:text-base mb-2 leading-snug lg:text-xl px-8">
           "I tried the other black active wear and I was wowed by the quality,
           you can literally see the intentionality in the cloth, the fit, the
           straps and how snug it is. You did your big one on this 🫶🏿🫶🏿.
@@ -48,9 +41,19 @@ const HomeReview = () => {
 
         <p className="italic text-xs sm:text-sm mb-3">- Alexandra.</p>
 
-        <button className="uppercase border border-white px-4 py-1.5 rounded text-xs sm:text-sm tracking-wide hover:bg-white hover:text-black transition-all">
+        <button className="uppercase border border-white px-4 py-1.5 rounded text-xs sm:text-sm tracking-wide hover:bg-white hover:text-black transition-all mt-8">
           Shop Wears
         </button>
+      </div>
+
+      {/* Desktop image section */}
+      <div className="hidden md:block md:w-1/2 h-full relative px-16">
+        <img
+          src={img}
+          alt="review"
+          className="w-full h-full object-cover brightness-100 rounded-lg"
+        />
+        <div className="absolute inset-0 bg-black/30"></div>
       </div>
     </div>
   );

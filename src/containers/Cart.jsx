@@ -9,6 +9,10 @@ import { useCart } from "../context/CartContext";
 import axios from "axios";
 import { useHomeContext } from "../context/HomeContext";
 import { localHost, renderAPI } from "../constants";
+import { PaystackButton } from "react-paystack";
+import PayButton from "../components/PaystackButton";
+import CartSkeleton from "../components/CartSkeleton";
+import { toast } from "react-toastify";
 
 const Cart = () => {
   const [cartSelected, setCartSelected] = useState(0);
@@ -16,12 +20,108 @@ const Cart = () => {
   const [isClearAction, setIsClearAction] = useState(false);
   const [activeProduct, setActiveProduct] = useState();
   const hasFetched = useRef(false);
-  const { cart, removeProduct, updateqty, total, setCartDirectly, clearCart } =
-    useCart();
+  const {
+    cart,
+    removeProduct,
+    updateqty,
+    total,
+    setCartDirectly,
+    clearCart,
+    applyDiscount,
+  } = useCart();
   const { loggedIn } = useHomeContext();
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderData, setOrderData] = useState(null);
+  const [loadingOrder, setLoadingOrder] = useState(false);
+  const [loadingCart, setLoadingCart] = useState(false);
+  const [addresses, setAddresses] = useState([]);
+  const [showOtherAddresses, setShowOtherAddresses] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState();
+  const [discountCode, setDiscountCode] = useState("");
+  const [verifyingCode, setVerifyingCode] = useState(false);
+  const [codeVerified, setCodeVerified] = useState(false);
+  const [discountTotal, setDiscountTotal] = useState();
 
   const userData = JSON.parse(localStorage.getItem("bj_userData"));
   const token = userData?.token;
+
+  const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+
+  const verifyDiscountCode = async () => {
+    setVerifyingCode(true);
+    try {
+      const res = await axios.get(
+        `${
+          location.origin.includes("localhost") ? localHost : renderAPI
+        }/api/discount/validate/${discountCode}`,
+        loggedIn ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+      );
+      setVerifyingCode(false);
+      setCodeVerified(true);
+      const discount = applyDiscount(res.data.discount);
+      setDiscountTotal(discount);
+      toast.success("Discount code applied");
+    } catch (err) {
+      setVerifyingCode(false);
+      toast.error(err.response.data.message);
+    }
+  };
+
+  const handleOrderSummary = async () => {
+    try {
+      setLoadingOrder(true);
+
+      const res = await axios.post(
+        `${
+          location.origin.includes("localhost") ? localHost : renderAPI
+        }/api/order/summary`,
+        {
+          cartItems: cart,
+          shippingAddress: selectedAddress,
+          discountCode: discountCode,
+        },
+        loggedIn ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+      );
+
+      setOrderData(res.data.summary); // summary instead of actual order
+      setShowOrderModal(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingOrder(false);
+    }
+  };
+
+  const handleCreateOrder = async () => {
+    try {
+      setLoadingOrder(true);
+
+      const endpoint = loggedIn ? "create" : "guest/create";
+
+      const res = await axios.post(
+        `${
+          location.origin.includes("localhost") ? localHost : renderAPI
+        }/api/order/${endpoint}`,
+        {
+          cartItems: cart,
+          paymentMethod: "paystack",
+          shippingAddress: selectedAddress,
+          guestInfo: loggedIn
+            ? undefined
+            : { name: guestName, email: guestEmail, phone: guestPhone },
+          discountCode: discountCode,
+        },
+        loggedIn ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+      );
+
+      setOrderData(res.data.order);
+      clearCart();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingOrder(false);
+    }
+  };
 
   const getUserCart = async () => {
     const response = await axios.get(
@@ -32,15 +132,48 @@ const Cart = () => {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
+    setLoadingCart(false);
     setCartDirectly(response.data.items);
+  };
+
+  const getAddresses = async (e) => {
+    try {
+      const response = await axios.get(
+        `${
+          location.origin.includes("localhost") ? localHost : renderAPI
+        }/api/user/addresses`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setAddresses(response.data);
+      return response.data; // array of addresses
+    } catch (err) {
+      console.error("Failed to fetch addresses:", err);
+    }
   };
 
   useEffect(() => {
     if (loggedIn && !hasFetched.current) {
+      setLoadingCart(true);
       hasFetched.current = true;
       getUserCart();
     }
   }, [loggedIn]);
+
+  useEffect(() => {
+    const mainAddress = addresses.find((addr) => addr.isDefault === true);
+    setSelectedAddress(mainAddress);
+  }, [addresses]);
+
+  useEffect(() => {
+    if (showOrderModal && addresses.length < 1) {
+      getAddresses();
+    }
+  }, [showOrderModal]);
 
   return (
     <div className="mt-10 max-w-[600px] m-auto pb-16 h-full">
@@ -76,8 +209,10 @@ const Cart = () => {
       </p>
 
       {cartSelected === 0 ? (
-        cart?.length > 0 ? (
-          <div>
+        loadingCart ? (
+          <CartSkeleton />
+        ) : cart?.length > 0 ? (
+          <div className="pb-12">
             <p
               className="text-right text-red-400 px-4 underline text-sm mt-4 cursor-pointer"
               onClick={() => {
@@ -175,7 +310,7 @@ const Cart = () => {
                   </div>
 
                   <p
-                    className="text-xs text-red-700 montserrat cursor-pointer font-semibold"
+                    className="text-xs text-red-700 montserrat cursor-pointer font-semibold underline"
                     onClick={() => {
                       setActiveProduct(item);
                       setShowActionModal(true);
@@ -187,7 +322,7 @@ const Cart = () => {
               </div>
             ))}
 
-            <div className="mt-8 bg-gray-800 p-4">
+            {/* <div className="mt-8 bg-gray-800 p-4">
               <p className="font-bold text-sm montserrat">ADD A LITTLE EXTRA</p>
               <p className="text-xs mt-2">
                 Add one or more of these items to earn XP and get free delivery.
@@ -227,56 +362,87 @@ const Cart = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <div className="px-4 mt-8">
               <p className="font-bold montserrat text-sm">DISCOUNT CODE</p>
 
               <div className="flex items-center justify-between mt-4">
                 <input
-                  className="border border-gray-300 text-xs rounded-3xl px-4 py-2"
+                  className={`${
+                    codeVerified ? "text-gray-400" : ""
+                  } border border-gray-300 text-xs rounded-3xl px-4 py-2`}
                   type="text"
+                  onChange={(e) => {
+                    setDiscountCode(e.target.value);
+                  }}
+                  value={discountCode}
+                  disabled={codeVerified}
                   placeholder="Enter code"
                 />
-                <button
-                  className={`bg-blue-800 text-xs text-white font-bold px-4 py-2 rounded-3xl montserrat cursor-pointer`}
-                >
-                  APPLY
-                </button>
+                <div className="flex flex-row items-center gap-2">
+                  <button
+                    onClick={verifyDiscountCode}
+                    disabled={
+                      verifyingCode || codeVerified || discountCode?.length < 6
+                    }
+                    className={`${
+                      verifyingCode || codeVerified || discountCode?.length < 6
+                        ? "bg-gray-500"
+                        : ""
+                    } bg-blue-800 text-xs text-white font-bold px-4 py-2 rounded-3xl montserrat cursor-pointer`}
+                  >
+                    {verifyingCode
+                      ? "APPLYING"
+                      : codeVerified
+                      ? "APPLIED"
+                      : "APPLY"}
+                  </button>
+
+                  {codeVerified && (
+                    <button
+                      onClick={() => {
+                        setCodeVerified(false);
+                        setDiscountCode("");
+                        setDiscountTotal(0);
+                      }}
+                      className={
+                        "bg-red-400 text-xs text-white font-bold px-4 py-2 rounded-3xl montserrat cursor-pointer"
+                      }
+                    >
+                      REMOVE
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
             <div className="px-4 mt-8">
-              <p className="font-bold montserrat text-sm">ORDER SUMMARY</p>
-
               <div className="flex flex-col gap-2">
                 <div className="mt-4 flex items-center justify-between text-xs">
-                  <p>Sub Total</p>
-                  <p>
-                    {total.toLocaleString("en-NG", {
-                      style: "currency",
-                      currency: "NGN",
-                    })}
+                  <p className="font-semibold text-lg">Sub Total</p>
+                  <p className="font-semibold text-lg">
+                    {(codeVerified ? discountTotal : total).toLocaleString(
+                      "en-NG",
+                      {
+                        style: "currency",
+                        currency: "NGN",
+                      }
+                    )}
                   </p>
-                </div>
-
-                <div className="flex items-center justify-between text-xs">
-                  <p>Estimated delivery</p>
-                  <p>$3.00</p>
-                </div>
-
-                <div className="flex items-center justify-between montserrat text-sm">
-                  <p className="font-bold">Total</p>
-                  <p className="font-bold">$58.00</p>
                 </div>
               </div>
             </div>
 
             <div className="max-w-[300px] m-auto mt-8">
               <button
-                className={`bg-blue-800 montserrat cursor-pointer w-full text-center text-white font-bold py-2 rounded-3xl`}
+                onClick={handleOrderSummary}
+                disabled={loadingOrder}
+                className={`bg-blue-800 montserrat cursor-pointer w-full text-center text-white font-bold py-2 rounded-3xl ${
+                  loadingOrder ? "opacity-70 cursor-not-allowed" : ""
+                }`}
               >
-                CHECKOUT SECURELY
+                {loadingOrder ? "Creating Order..." : "CHECKOUT SECURELY"}
               </button>
             </div>
           </div>
@@ -368,6 +534,203 @@ const Cart = () => {
                 className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-sm transition-colors"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showOrderModal && orderData && (
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] backdrop-blur-md flex items-center justify-center z-50">
+          <div className="bg-[#0f172a] border border-[#1e293b] text-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-md animate-fadeIn">
+            <h3 className="text-xl font-semibold mb-4 text-[#f8fafc] tracking-wide">
+              Order Summary
+            </h3>
+
+            {/* Order Items */}
+            <div className="mt-2">
+              <p className="font-semibold mb-3 text-gray-100 text-sm">Items</p>
+              <div className="max-h-56 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                {orderData.items.map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 border-b border-[#1e293b] pb-2"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-12 h-12 object-cover rounded-md border border-[#1e293b]"
+                    />
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-gray-200">
+                        {item.name}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {item.size} • {item.color}
+                      </p>
+                      <p className="text-xs text-gray-300">
+                        ₦{item.price.toLocaleString()} × {item.qty}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 🧾 Total Section */}
+            {/* 🧾 Total Section */}
+            <div className="mt-6 border-t border-[#1e293b] pt-4">
+              <div className="flex items-center justify-between text-sm">
+                <p className="text-gray-400">Subtotal</p>
+                <p className="text-gray-100 font-medium">
+                  ₦{orderData.subTotal?.toLocaleString()}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between text-sm mt-1">
+                <p className="text-gray-400">Tax</p>
+                <p className="text-gray-100 font-medium">
+                  ₦{orderData.tax?.toLocaleString()}
+                </p>
+              </div>
+
+              {/* If discount applied */}
+              {orderData.discountAmount > 0 && (
+                <>
+                  <div className="flex items-center justify-between text-sm mt-1">
+                    <p className="text-gray-400">
+                      Discount{" "}
+                      {orderData.discountCode && (
+                        <span className="text-xs text-green-400 ml-1">
+                          ({orderData.discountCode.toUpperCase()})
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-green-400 font-medium">
+                      -₦{orderData.discountAmount.toLocaleString()}
+                    </p>
+                  </div>
+
+                  {/* Original Total (slashed) */}
+                  <div className="flex items-center justify-between text-sm mt-2">
+                    <p className="text-gray-400">Original Total</p>
+                    <p className="text-gray-500 line-through font-medium">
+                      ₦
+                      {(
+                        orderData.total + orderData.discountAmount
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {/* Final Total */}
+              <div className="flex items-center justify-between mt-2 border-t border-[#1e293b] pt-2">
+                <p className="text-gray-100 font-semibold">Total</p>
+                <p className="text-[#22c55e] font-bold text-lg">
+                  ₦{orderData.total?.toLocaleString()}
+                </p>
+              </div>
+            </div>
+
+            {/* Address Section */}
+            <div className="mt-6">
+              {loggedIn ? (
+                <>
+                  {addresses.length > 0 && (
+                    <div className="border border-[#1e293b] rounded-lg p-4 mb-2">
+                      <p className="text-gray-100 font-semibold">
+                        {addresses.find((a) => a.isDefault)?.firstName}{" "}
+                        {addresses.find((a) => a.isDefault)?.lastName}
+                      </p>
+                      <p className="text-gray-400 text-sm">
+                        {addresses.find((a) => a.isDefault)?.line1}
+                      </p>
+                      {addresses.find((a) => a.isDefault)?.line2 && (
+                        <p className="text-gray-400 text-sm">
+                          {addresses.find((a) => a.isDefault)?.line2}
+                        </p>
+                      )}
+                      <p className="text-gray-400 text-sm">
+                        {addresses.find((a) => a.isDefault)?.city},{" "}
+                        {addresses.find((a) => a.isDefault)?.state}{" "}
+                        {addresses.find((a) => a.isDefault)?.postalCode}
+                      </p>
+                      <p className="text-gray-400 text-sm">
+                        {addresses.find((a) => a.isDefault)?.phone}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 mb-2">
+                    {addresses.length > 1 && (
+                      <button
+                        className="text-sm underline text-blue-400"
+                        onClick={() =>
+                          setShowOtherAddresses(!showOtherAddresses)
+                        }
+                      >
+                        Change Address
+                      </button>
+                    )}
+                    <button
+                      className="text-sm underline text-blue-400"
+                      onClick={() => navigate("/addresses")}
+                    >
+                      Add Address
+                    </button>
+                  </div>
+
+                  {showOtherAddresses && (
+                    <div className="space-y-2 max-h-36 overflow-y-auto">
+                      {addresses
+                        .filter((a) => !a.isDefault)
+                        .map((addr) => (
+                          <button
+                            key={addr.id}
+                            className={`w-full text-left p-2 rounded-lg border ${
+                              selectedAddress?.id === addr.id
+                                ? "border-blue-500"
+                                : "border-[#1e293b]"
+                            }`}
+                            onClick={() => setSelectedAddress(addr)}
+                          >
+                            {addr.firstName} {addr.lastName}, {addr.line1}{" "}
+                            {addr.line2}, {addr.city}, {addr.state},{" "}
+                            {addr.postalCode}
+                          </button>
+                        ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="border-2 border-[#1e293b] p-4 rounded-lg">
+                  <p className="text-gray-100 font-semibold mb-2 text-sm">
+                    Enter your address
+                  </p>
+                  {addNew && <NewAddressForm />}
+                </div>
+              )}
+            </div>
+
+            {/* Paystack + Close */}
+            <div className="flex justify-between items-center mt-6">
+              <PayButton
+                email={"ogogorchimadika@gmail.com"}
+                amount={orderData.total * 100}
+                metadata={{ name }}
+                disabled={!selectedAddress}
+                publicKey={publicKey}
+                createOrder={handleCreateOrder}
+              />
+              <button
+                className="px-5 py-2.5 bg-[#1e293b] hover:bg-[#334155] rounded-lg text-sm font-semibold transition-all duration-300 text-gray-100 shadow-md hover:shadow-lg"
+                onClick={() => {
+                  setShowOrderModal(false);
+                  setOrderData(null);
+                }}
+              >
+                Close
               </button>
             </div>
           </div>

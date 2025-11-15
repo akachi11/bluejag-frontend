@@ -11,7 +11,7 @@ import {
 
 const Announcement = () => {
   return (
-    <AnnouncementContainer className="bg-blue-950">
+    <AnnouncementContainer className="bg-blue-950 z-20">
       <AnnouncementInfo>
         <AnnouncementText>
           FREE Delivery with Orders ₦70,000+🔥
