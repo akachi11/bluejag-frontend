@@ -1,6 +1,7 @@
 import React from "react";
 import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
 
 export const getStoredUser = () => {
   try {
@@ -33,4 +34,8 @@ export const stars = (ratingVal) => {
     ...(hasHalfStar ? [<FaStarHalfAlt key="half" />] : []),
     ...Array(emptyStars).fill(<FaRegStar key={`empty-${emptyStars}`} />),
   ];
+};
+
+export const clickedComingSoon = () => {
+  toast.info("Coming soon");
 };

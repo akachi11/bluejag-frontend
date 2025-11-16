@@ -48,7 +48,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
           {/* Mobile Drawer */}
           <motion.div
-            className="fixed z-50 bg-gray-900 w-full h-[90vh] bottom-0 rounded-t-3xl overflow-y-auto sm:hidden"
+            className="fixed z-50 bg-gray-900 w-full h-[80vh] bottom-0 rounded-t-3xl overflow-y-auto sm:hidden"
             variants={mobileVariants}
             initial="hidden"
             animate="visible"

@@ -23,6 +23,7 @@ import Orders from "./containers/Orders";
 import AddressBook from "./containers/AddressBook";
 import OrderDetails from "./containers/OrderDetail";
 import Loyalty from "./containers/Loyalty";
+import FourZeroFour from "./containers/FourZeroFour";
 
 function App() {
   const { isCartOpen, toggleCart, setLoggedIn, loggedIn, sideBarOpen } =
@@ -88,7 +89,7 @@ function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
 
           {/* Optional: 404 route */}
-          {/* <Route path="*" element={<NotFound />} /> */}
+          <Route path="*" element={<FourZeroFour />} />
         </Routes>
       </main>
 

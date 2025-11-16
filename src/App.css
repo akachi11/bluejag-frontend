@@ -16,6 +16,17 @@
   }
 }
 
+@keyframes radiate {
+  0%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+
 @keyframes shimmer {
   0% {
     background-position: -600px 0;
@@ -27,6 +38,10 @@
 
 .animate-icon-pulse {
   animation: icon-pulse 1.5s infinite ease-in-out;
+}
+
+.radiate {
+  animation: radiate 1.2s ease-in-out infinite;
 }
 
 @keyframes fadeIn {
@@ -41,6 +56,21 @@
 }
 .animate-fadeIn {
   animation: fadeIn 0.15s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
 }
 
 * {

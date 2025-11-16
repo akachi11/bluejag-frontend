@@ -21,6 +21,7 @@ import female from "../assets/Female/femaleHard.JPG";
 import { useHomeContext } from "../context/HomeContext";
 import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { clickedComingSoon } from "../utils";
 
 const Sidebar = () => {
   const { sideBarOpen, toggleSideBar } = useHomeContext();
@@ -126,11 +127,15 @@ const Sidebar = () => {
 
           {/* LAST CALL */}
           <SideBarMainLink className="last-call">
-            <Paragraph>LAST CALL</Paragraph>
+            <Paragraph onClick={clickedComingSoon} className="text-zinc-500">
+              LAST CALL
+            </Paragraph>
           </SideBarMainLink>
 
           <SideBarMainLink>
-            <Paragraph>PRE ORDER</Paragraph>
+            <Paragraph onClick={clickedComingSoon} className="text-zinc-500">
+              PRE ORDER
+            </Paragraph>
           </SideBarMainLink>
         </SideBarMainLinks>
 
