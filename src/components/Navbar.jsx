@@ -160,7 +160,7 @@ const Navbar = () => {
   useEffect(() => {
     if (searchOverlayOpen) {
       fetchTrendingSearches();
-      fetchRecentSearches();
+      loggedIn && fetchRecentSearches();
       searchInputRef.current.focus();
     }
   }, [searchOverlayOpen]);
@@ -424,39 +424,41 @@ const Navbar = () => {
                       </div>
                     </div>
 
-                    <div>
-                      <div className="flex justify-between items-center lg:gap-8 lg:justify-start">
-                        <p className="montserrat font-semibold">
-                          RECENT SEARCHES
-                        </p>
-                        {recentSearches.length > 0 && (
-                          <p className="bg-red-300 w-fit text-xs rounded-3xl px-2 py-1 text-black font-semibold uppercase montserrat cursor-pointer">
-                            Clear
+                    {loggedIn && (
+                      <div>
+                        <div className="flex justify-between items-center lg:gap-8 lg:justify-start">
+                          <p className="montserrat font-semibold">
+                            RECENT SEARCHES
+                          </p>
+                          {recentSearches.length > 0 && (
+                            <p className="bg-red-300 w-fit text-xs rounded-3xl px-2 py-1 text-black font-semibold uppercase montserrat cursor-pointer">
+                              Clear
+                            </p>
+                          )}
+                        </div>
+
+                        {recentSearches.length > 0 ? (
+                          <div className="flex flex-col gap-2 mt-4 lg:flex-row lg:flex-wrap lg:gap-4">
+                            {recentSearches.map((item, idx) => (
+                              <div
+                                key={idx}
+                                className="flex gap-2 items-center lg:gap-1"
+                                onClick={() => {
+                                  handleSearch(item);
+                                }}
+                              >
+                                <SearchIcon size={15} />
+                                <p>{item}</p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="mt-4 italic text-zinc-400">
+                            You have no recent searches
                           </p>
                         )}
                       </div>
-
-                      {recentSearches.length > 0 ? (
-                        <div className="flex flex-col gap-2 mt-4 lg:flex-row lg:flex-wrap lg:gap-4">
-                          {recentSearches.map((item, idx) => (
-                            <div
-                              key={idx}
-                              className="flex gap-2 items-center lg:gap-1"
-                              onClick={() => {
-                                handleSearch(item);
-                              }}
-                            >
-                              <SearchIcon size={15} />
-                              <p>{item}</p>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="mt-4 italic text-zinc-400">
-                          You have no recent searches
-                        </p>
-                      )}
-                    </div>
+                    )}
                   </div>
 
                   {/* <div className="lg:flex-1 min-w-0">

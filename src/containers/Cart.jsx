@@ -14,6 +14,7 @@ import PayButton from "../components/PaystackButton";
 import CartSkeleton from "../components/CartSkeleton";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { nigerianStates } from "../Constants/States";
 
 const Cart = () => {
   const [cartSelected, setCartSelected] = useState(0);
@@ -45,9 +46,78 @@ const Cart = () => {
   const [verifyingCode, setVerifyingCode] = useState(false);
   const [codeVerified, setCodeVerified] = useState(false);
   const [discountTotal, setDiscountTotal] = useState();
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    address1: "",
+    address2: "",
+    phone: "",
+    city: "",
+    region: "",
+    postalCode: "",
+    mainAddress: false,
+  });
+  const [touched, setTouched] = useState({});
+  const [errors, setErrors] = useState({});
+  const [isValid, setIsValid] = useState(false);
+
+  const formRef = useRef(null);
 
   const userData = JSON.parse(localStorage.getItem("bj_userData"));
   const token = userData?.token;
+
+  useEffect(() => {
+    const validationErrors = validate();
+    setErrors(validationErrors);
+    setIsValid(Object.keys(validationErrors).length === 0);
+  }, [formData]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      line1: formData.address1,
+      line2: formData.address2,
+      city: formData.city,
+      state: formData.region,
+      postalCode: formData.postalCode,
+      isDefault: formData.mainAddress,
+    };
+
+    setSelectedAddress(payload);
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.firstName) newErrors.firstName = "First name is required.";
+    if (!formData.lastName) newErrors.lastName = "Last name is required.";
+    if (!formData.email) newErrors.email = "Email is required.";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Please enter a valid email address.";
+    if (!formData.address1) newErrors.address1 = "Address line 1 is required.";
+    if (!formData.city) newErrors.city = "City is required.";
+    if (!formData.region) newErrors.region = "State is required.";
+    if (!formData.postalCode) newErrors.postalCode = "Postal code is required.";
+    return newErrors;
+  };
 
   const navigate = useNavigate();
 
@@ -114,7 +184,11 @@ const Cart = () => {
           shippingAddress: selectedAddress,
           guestInfo: loggedIn
             ? undefined
-            : { name: guestName, email: guestEmail, phone: guestPhone },
+            : {
+                name: `${selectedAddress.firstName} ${selectedAddress.lastName}`,
+                email: selectedAddress.email,
+                phone: selectedAddress.phone,
+              },
           discountCode: discountCode,
         },
         loggedIn ? { headers: { Authorization: `Bearer ${token}` } } : undefined
@@ -176,7 +250,7 @@ const Cart = () => {
   }, [addresses]);
 
   useEffect(() => {
-    if (showOrderModal && addresses.length < 1) {
+    if (loggedIn && showOrderModal && addresses.length < 1) {
       getAddresses();
     }
   }, [showOrderModal]);
@@ -464,6 +538,20 @@ const Cart = () => {
             </button>
           </div>
         )
+      ) : !loggedIn ? (
+        <div className="h-full flex flex-col items-center justify-center">
+          <p className="montserrat font-bold">SIGN IN</p>
+          <p className="mt-2">Sign in to add items to your wishlist</p>
+
+          <button
+            className={`mt-4 rounded-3xl bg-blue-900 text-white montserrat font-bold px-4 py-2`}
+            onClick={() => {
+              navigate("/signin");
+            }}
+          >
+            SIGN IN
+          </button>
+        </div>
       ) : favorites.length < 1 ? (
         <div className="h-full flex flex-col items-center justify-center">
           <p className="montserrat font-bold">YOUR WISHLIST IS EMPTY</p>
@@ -586,8 +674,18 @@ const Cart = () => {
       )}
 
       {showOrderModal && orderData && (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] backdrop-blur-md flex items-center justify-center z-50">
-          <div className="bg-[#0f172a] border border-[#1e293b] text-white rounded-2xl shadow-2xl p-6 w-[90%] max-w-md animate-fadeIn">
+        <div
+          className="fixed inset-0 bg-[rgba(0,0,0,0.5)] backdrop-blur-md flex items-center justify-center z-50"
+          onClick={() => {
+            setShowOrderModal(false);
+          }}
+        >
+          <div
+            className="bg-[#0f172a] border border-[#1e293b] text-white rounded-2xl shadow-2xl p-6 w-[90%] max-h-[80vh] overflow-y-auto max-w-md animate-fadeIn"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
             <h3 className="text-xl font-semibold mb-4 text-[#f8fafc] tracking-wide">
               Order Summary
             </h3>
@@ -680,56 +778,57 @@ const Cart = () => {
 
             {/* Address Section */}
             <div className="mt-6">
-              {loggedIn ? (
+              {selectedAddress ? (
                 <>
-                  {addresses.length > 0 && (
-                    <div className="border border-[#1e293b] rounded-lg p-4 mb-2">
-                      <p className="text-gray-100 font-semibold">
-                        {addresses.find((a) => a.isDefault)?.firstName}{" "}
-                        {addresses.find((a) => a.isDefault)?.lastName}
-                      </p>
+                  {/* Show Selected Address */}
+                  <div className="border border-[#1e293b] rounded-lg p-4 mb-2">
+                    <p className="text-gray-100 font-semibold">
+                      {selectedAddress.firstName} {selectedAddress.lastName}
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      {selectedAddress.line1}
+                    </p>
+                    {selectedAddress.line2 && (
                       <p className="text-gray-400 text-sm">
-                        {addresses.find((a) => a.isDefault)?.line1}
+                        {selectedAddress.line2}
                       </p>
-                      {addresses.find((a) => a.isDefault)?.line2 && (
-                        <p className="text-gray-400 text-sm">
-                          {addresses.find((a) => a.isDefault)?.line2}
-                        </p>
+                    )}
+                    <p className="text-gray-400 text-sm">
+                      {selectedAddress.city}, {selectedAddress.state}{" "}
+                      {selectedAddress.postalCode}
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      {selectedAddress.phone}
+                    </p>
+                  </div>
+
+                  {/* Show change/add buttons if logged in */}
+                  {loggedIn && (
+                    <div className="flex gap-2 mb-2">
+                      {addresses.length > 1 && (
+                        <button
+                          className="text-sm underline text-blue-400"
+                          onClick={() =>
+                            setShowOtherAddresses(!showOtherAddresses)
+                          }
+                        >
+                          Change Address
+                        </button>
                       )}
-                      <p className="text-gray-400 text-sm">
-                        {addresses.find((a) => a.isDefault)?.city},{" "}
-                        {addresses.find((a) => a.isDefault)?.state}{" "}
-                        {addresses.find((a) => a.isDefault)?.postalCode}
-                      </p>
-                      <p className="text-gray-400 text-sm">
-                        {addresses.find((a) => a.isDefault)?.phone}
-                      </p>
+                      <button
+                        className="text-sm underline text-blue-400"
+                        onClick={() => navigate("/addresses")}
+                      >
+                        Add Address
+                      </button>
                     </div>
                   )}
 
-                  <div className="flex gap-2 mb-2">
-                    {addresses.length > 1 && (
-                      <button
-                        className="text-sm underline text-blue-400"
-                        onClick={() =>
-                          setShowOtherAddresses(!showOtherAddresses)
-                        }
-                      >
-                        Change Address
-                      </button>
-                    )}
-                    <button
-                      className="text-sm underline text-blue-400"
-                      onClick={() => navigate("/addresses")}
-                    >
-                      Add Address
-                    </button>
-                  </div>
-
-                  {showOtherAddresses && (
+                  {/* Show other addresses if toggled */}
+                  {showOtherAddresses && loggedIn && (
                     <div className="space-y-2 max-h-36 overflow-y-auto">
                       {addresses
-                        .filter((a) => !a.isDefault)
+                        .filter((a) => a.id !== selectedAddress.id)
                         .map((addr) => (
                           <button
                             key={addr.id}
@@ -749,11 +848,215 @@ const Cart = () => {
                   )}
                 </>
               ) : (
-                <div className="border-2 border-[#1e293b] p-4 rounded-lg">
-                  <p className="text-gray-100 font-semibold mb-2 text-sm">
-                    Enter your address
+                <div
+                  className="border-2 border-blue-950 rounded-2xl p-4 flex flex-col gap-4"
+                  ref={formRef}
+                >
+                  <p className="montserrat text-zinc-300 text-sm font-semibold">
+                    Delivery Information
                   </p>
-                  {addNew && <NewAddressForm />}
+                  <form className="flex flex-col gap-4">
+                    {/* Name fields */}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-400">
+                          First Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className="mt-1 w-full rounded-lg border border-gray-300 bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        />
+                        {touched.firstName && errors.firstName && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.firstName}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-400">
+                          Last Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className="mt-1 w-full rounded-lg border border-gray-300 bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        />
+                        {touched.lastName && errors.lastName && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.lastName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">
+                        Email <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="mt-1 w-full rounded-lg border border-gray-300 bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      />
+                      {touched.email && errors.email && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.email}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Phone */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">
+                        Phone number <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="mt-1 w-full rounded-lg border border-gray-300 bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      />
+                    </div>
+
+                    {/* Address */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">
+                        Address Line 1 <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="address1"
+                        value={formData.address1}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="mt-1 w-full rounded-lg border border-gray-300 bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      />
+                      {touched.address1 && errors.address1 && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.address1}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">
+                        Address Line 2
+                      </label>
+                      <input
+                        type="text"
+                        name="address2"
+                        value={formData.address2}
+                        onChange={handleChange}
+                        className="mt-1 w-full rounded-lg border border-gray-300 bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      />
+                    </div>
+
+                    {/* City and State */}
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-400">
+                          City <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
+                          value={formData.city}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className="mt-1 w-full rounded-lg border border-gray-300 bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        />
+                        {touched.city && errors.city && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.city}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-400">
+                          State <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          name="region"
+                          value={formData.region}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          className="mt-1 w-full rounded-lg border border-gray-300 bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        >
+                          <option value="">Select a state</option>
+                          {nigerianStates.map((state) => (
+                            <option key={state} value={state}>
+                              {state}
+                            </option>
+                          ))}
+                        </select>
+                        {touched.region && errors.region && (
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.region}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Postal Code */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-400">
+                        Postal Code <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="mt-1 w-full rounded-lg border border-gray-300 bg-transparent p-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      />
+                      {touched.postalCode && errors.postalCode && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.postalCode}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="flex flex-row gap-4">
+                      <button
+                        onClick={handleSubmit}
+                        disabled={!isValid}
+                        className={`mt-4 text-white py-2 rounded-3xl px-8 transition-colors ${
+                          isValid
+                            ? "bg-blue-900 hover:bg-blue-800"
+                            : "bg-gray-600 cursor-not-allowed"
+                        }`}
+                      >
+                        Save
+                      </button>
+
+                      <button
+                        type="button"
+                        className="mt-4 bg-gray-800 text-white py-2 rounded-3xl hover:bg-blue-800 transition-colors px-8"
+                        onClick={() => {
+                          setAddNew(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
                 </div>
               )}
             </div>

@@ -37,9 +37,10 @@ import { useCart } from "../context/CartContext";
 import { localHost, renderAPI } from "../constants";
 import ProductSkeleton from "../components/ProductPageSkeleton";
 import { toast } from "react-toastify";
+import { useHomeContext } from "../context/HomeContext";
+import { IoHeart, IoHeartOutline } from "react-icons/io5";
 
 const ProductPage = () => {
-  const [bookmarked, setBookmarked] = useState(false);
   const [openAccordion, setOpenAccordion] = useState();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
@@ -56,14 +57,9 @@ const ProductPage = () => {
 
   const accordionTitles = ["details", "materials", "care", "notes"];
   const { pid } = useParams();
-  const { addProduct } = useCart();
-  const Ratings = {
-    1: 0,
-    2: 7 / 50,
-    3: 15 / 50,
-    4: 8 / 50,
-    5: 20 / 50,
-  };
+  const { addProduct, favoriteItem, favIds, removeFavorites } = useCart();
+
+  const { loggedIn } = useHomeContext();
 
   useEffect(() => {
     const onKey = (e) => {
@@ -190,11 +186,32 @@ const ProductPage = () => {
             </ProductTop>
 
             <ProductImg>
-              <IconContainer
-                onClick={() => setBookmarked(!bookmarked)}
-                className="bookmark text-shadow-blue-900"
-              >
-                {bookmarked ? <GoBookmarkFill /> : <GoBookmarkSlash />}
+              <IconContainer className="bookmark">
+                {loggedIn &&
+                  (favIds?.includes(product?._id) ? (
+                    <IoHeart
+                      size={35}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFavorites(product._id);
+                      }}
+                      className="absolute top-2 right-2 text-white bg-[rgba(0,0,0,0.38)] rounded-full p-2 cursor-pointer"
+                    />
+                  ) : (
+                    <IoHeartOutline
+                      size={35}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        favoriteItem({
+                          name: product.name,
+                          price: product.price,
+                          thumbnail: product.thumbnail,
+                          _id: product._id,
+                        });
+                      }}
+                      className="absolute top-2 right-2 text-white bg-[rgba(0,0,0,0.38)] rounded-full p-2 cursor-pointer"
+                    />
+                  ))}
               </IconContainer>
               <SpecialInfo className="bg-blue-900">LIMITED EDITION</SpecialInfo>
               <div onClick={() => openPreview(0)} style={{ cursor: "zoom-in" }}>

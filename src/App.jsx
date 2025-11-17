@@ -53,7 +53,7 @@ function App() {
       setLoggedIn(false);
     }
 
-    fetchFavorites();
+    loggedIn && fetchFavorites();
   }, []);
 
   useEffect(() => {

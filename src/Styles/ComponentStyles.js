@@ -10,7 +10,6 @@ export const IconContainer = styled.div`
     top: 0;
     right: 0;
     z-index: 2;
-    margin: 0.5rem;
     font-size: 1.5rem;
   }
 `
