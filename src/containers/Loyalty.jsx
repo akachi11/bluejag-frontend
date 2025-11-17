@@ -68,32 +68,39 @@ const Loyalty = () => {
         <div className="flex-3 bg-gray-900 p-6 rounded-xl shadow-lg">
           <h3 className="font-semibold text-lg mb-4">Active XP Events</h3>
           <div className="relative">
-            <div
-              ref={scrollRef}
-              className="flex flex-col gap-3 max-h-[400px] overflow-y-auto hide-scrollbar pr-2"
-            >
-              {activeEvents.map((event, i) => (
-                <div
-                  key={i}
-                  className="flex justify-between items-center bg-gray-800 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200"
-                >
-                  <div className="text-sm md:text-base">{event.name}</div>
-                  <div className="flex items-center gap-2">
-                    {event.done && (
-                      <CheckIcon size={16} className="text-green-400" />
-                    )}
-                    <span className="text-blue-400 font-semibold">
-                      {event.xp} XP
-                    </span>
+            <div className="relative">
+              <div
+                ref={scrollRef}
+                className="flex flex-col gap-3 max-h-[400px] overflow-y-auto hide-scrollbar pr-2"
+              >
+                {activeEvents.map((event, i) => (
+                  <div
+                    key={i}
+                    className="flex justify-between items-center bg-gray-800 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                  >
+                    <div className="text-sm md:text-base">{event.name}</div>
+                    <div className="flex items-center gap-2">
+                      {event.done && (
+                        <CheckIcon size={16} className="text-green-400" />
+                      )}
+                      <span className="text-blue-400 font-semibold">
+                        {event.xp} XP
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
               {canScrollUp && (
-                <ChevronUp className="absolute top-2 left-1/2 transform -translate-x-1/2 text-blue-500 w-6 h-6 animate-bounce z-10" />
+                <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-black/60 to-transparent pointer-events-none flex items-start justify-center pt-2 z-10">
+                  <ChevronUp className="text-blue-500 w-6 h-6 animate-bounce" />
+                </div>
               )}
+
               {canScrollDown && (
-                <ChevronDown className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-blue-500 w-6 h-6 animate-bounce z-10" />
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/60 to-transparent pointer-events-none flex items-end justify-center pb-2 z-10">
+                  <ChevronDown className="text-blue-500 w-6 h-6 animate-bounce" />
+                </div>
               )}
             </div>
           </div>
