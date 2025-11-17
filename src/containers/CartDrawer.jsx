@@ -48,7 +48,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
           {/* Mobile Drawer */}
           <motion.div
-            className="fixed z-50 bg-gray-900 w-full h-[80vh] bottom-0 rounded-t-3xl overflow-y-auto sm:hidden"
+            className="fixed z-50 bg-gray-950 w-full h-[80vh] bottom-0 rounded-t-3xl overflow-y-auto sm:hidden"
             variants={mobileVariants}
             initial="hidden"
             animate="visible"
@@ -68,7 +68,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 
           {/* Desktop Drawer */}
           <motion.div
-            className="hidden sm:block fixed z-50 bg-gray-950 h-full right-0 top-0 overflow-y-auto w-[420px] shadow-lg"
+            className="hidden sm:block fixed z-50 bg-gray-950 h-screen right-0 top-0 overflow-y-auto w-[420px] shadow-lg"
             variants={desktopVariants}
             initial="hidden"
             animate="visible"

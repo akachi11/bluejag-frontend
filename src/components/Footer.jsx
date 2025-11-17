@@ -1,16 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   CompanyFooterInfo,
   Div,
   DotSeperatedText,
   FooterContainer,
-  FooterMenu,
-  FooterMenuContainer,
-  FooterMenuItem,
-  FooterMenuItemHeader,
-  FooterMenuItemInput,
-  FooterMenuItemSub,
-  FooterMenuItemSubItem,
   FooterSocialsContainer,
   FooterSocialsIcon,
   NewsletterContainer,
@@ -34,18 +27,34 @@ import { LuDot } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const [trackingId, setTrackingId] = useState("");
   const navigate = useNavigate();
 
   return (
     <FooterContainer>
-      <CompanyFooterInfo className="md:w-[50%]">
+      <CompanyFooterInfo className="md:w-[70%]">
         <Div>
           <NewsletterContainer>
-            <Paragraph>JOIN OUR NEWSLETTER</Paragraph>
-            <Paragraph className="footer-email">EMAIL ADDRESS:</Paragraph>
+            <Paragraph className="footer-email">TRACK YOUR ORDER:</Paragraph>
             <NewsletterEmailContainer>
-              <NewsletterEmailInput placeholder="ENTER YOUR EMAIL ADDRESS" />
-              <NewsletterEmailBtn>SUBSCRIBE</NewsletterEmailBtn>
+              <NewsletterEmailInput
+                onChange={(e) => {
+                  setTrackingId(e.target.value);
+                }}
+                placeholder="ENTER YOUR TRACKING ID"
+              />
+              <NewsletterEmailBtn
+                className={`${
+                  trackingId.length < 6 ? "bg-blue-300" : "bg-blue-800"
+                }`}
+                disabled={trackingId.length < 6}
+                onClick={() => {
+                  navigate(`/order/${trackingId}`);
+                  toggleSideBar();
+                }}
+              >
+                FIND ORDER
+              </NewsletterEmailBtn>
             </NewsletterEmailContainer>
           </NewsletterContainer>
 
@@ -77,9 +86,9 @@ const Footer = () => {
             >
               <FaSnapchat />
             </FooterSocialsIcon>
-            <FooterSocialsIcon>
+            {/* <FooterSocialsIcon>
               <FaYoutube />
-            </FooterSocialsIcon>
+            </FooterSocialsIcon> */}
           </FooterSocialsContainer>
         </Div>
 
@@ -146,7 +155,9 @@ const Footer = () => {
       </SupportBox>
 
       <Policies>
-        <Paragraph>2024 Bluejag, Inc. All Rights Reserved</Paragraph>
+        <Paragraph>
+          {new Date().getFullYear()} Bluejag, Inc. All Rights Reserved
+        </Paragraph>
         <DotSeperatedText>
           <Div>
             <Paragraph

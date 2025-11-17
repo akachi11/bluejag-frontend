@@ -14,8 +14,6 @@ const baseShimmer = css`
 `;
 
 export const AddressSkeletonWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
   gap: 1.5rem;
 `;
 
@@ -38,35 +36,40 @@ export const SkeletonLine = styled.div`
 export const SkeletonButton = styled.div`
   width: 8rem;
   height: 2.2rem;
-  margin-top: 0.5rem;
   border-radius: 9999px;
+  margin: auto;
+  margin-top: 1rem;
   ${baseShimmer};
 `;
 
 export const AddressBookSkeleton = () => (
-  <AddressSkeletonWrapper className="px-4">
+  <AddressSkeletonWrapper className="px-4 flex flex-col gap-8 md:flex-row md:justify-between">
     {/* Main Address */}
-    <AddressCardSkeleton>
-      <SkeletonLine width="30%" height="1rem" />
-      <div style={{ marginTop: "0.5rem" }}>
-        <SkeletonLine width="60%" />
-        <SkeletonLine width="50%" />
-        <SkeletonLine width="70%" />
-        <SkeletonLine width="40%" />
-      </div>
-    </AddressCardSkeleton>
-
-    {/* Add Address Button */}
-    <SkeletonButton />
-
-    {/* Address List */}
-    {[...Array(2)].map((_, i) => (
-      <AddressCardSkeleton key={i}>
-        <SkeletonLine width="50%" />
-        <SkeletonLine width="80%" />
-        <SkeletonLine width="70%" />
-        <SkeletonLine width="60%" />
+    <div className="flex-1">
+      <AddressCardSkeleton>
+        <SkeletonLine width="30%" height="1rem" />
+        <div style={{ marginTop: "0.5rem" }}>
+          <SkeletonLine width="60%" />
+          <SkeletonLine width="50%" />
+          <SkeletonLine width="70%" />
+          <SkeletonLine width="40%" />
+        </div>
       </AddressCardSkeleton>
-    ))}
+
+      {/* Add Address Button */}
+      <SkeletonButton />
+    </div>
+
+    <div className="flex-1 flex flex-col gap-2">
+      {/* Address List */}
+      {[...Array(2)].map((_, i) => (
+        <AddressCardSkeleton key={i}>
+          <SkeletonLine width="50%" />
+          <SkeletonLine width="80%" />
+          <SkeletonLine width="70%" />
+          <SkeletonLine width="60%" />
+        </AddressCardSkeleton>
+      ))}
+    </div>
   </AddressSkeletonWrapper>
 );

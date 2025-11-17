@@ -365,14 +365,9 @@ const Navbar = () => {
                                     alt=""
                                     className="w-full h-auto object-cover"
                                   />
-                                  <ShoppingCartIcon
-                                    size={35}
-                                    className="absolute top-2 right-2 bg-[rgba(0,0,0,0.38)] rounded-full p-2 cursor-pointer text-white"
-                                  />
-
                                   <HeartIcon
                                     size={35}
-                                    className="absolute top-2 left-2 text-white bg-[rgba(0,0,0,0.38)] rounded-full p-2 cursor-pointer"
+                                    className="absolute top-2 right-2 text-white bg-[rgba(0,0,0,0.38)] rounded-full p-2 cursor-pointer"
                                   />
                                 </div>
 

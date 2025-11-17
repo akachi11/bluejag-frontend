@@ -13,6 +13,7 @@ import { PaystackButton } from "react-paystack";
 import PayButton from "../components/PaystackButton";
 import CartSkeleton from "../components/CartSkeleton";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const [cartSelected, setCartSelected] = useState(0);
@@ -28,6 +29,9 @@ const Cart = () => {
     setCartDirectly,
     clearCart,
     applyDiscount,
+    favorites,
+    removeFavorites,
+    clearFavorites,
   } = useCart();
   const { loggedIn } = useHomeContext();
   const [showOrderModal, setShowOrderModal] = useState(false);
@@ -44,6 +48,8 @@ const Cart = () => {
 
   const userData = JSON.parse(localStorage.getItem("bj_userData"));
   const token = userData?.token;
+
+  const navigate = useNavigate();
 
   const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
@@ -176,7 +182,7 @@ const Cart = () => {
   }, [showOrderModal]);
 
   return (
-    <div className="mt-10 max-w-[600px] m-auto pb-16 h-full">
+    <div className="pt-10 max-w-[600px] m-auto pb-16 h-full bg-gray-950">
       <div className="flex justify-center bg-gray-800 w-fit m-auto rounded-3xl">
         <div
           onClick={() => {
@@ -458,31 +464,68 @@ const Cart = () => {
             </button>
           </div>
         )
+      ) : favorites.length < 1 ? (
+        <div className="h-full flex flex-col items-center justify-center">
+          <p className="montserrat font-bold">YOUR WISHLIST IS EMPTY</p>
+          <p className="mt-2">You have not added any items to your wishlist</p>
+
+          <button
+            className={`mt-4 rounded-3xl bg-blue-900 text-white montserrat font-bold px-4 py-2`}
+          >
+            SHOP NOW
+          </button>
+        </div>
       ) : (
         <div>
-          {Array.from({ length: 3 }, (_, i) => (
+          <p
+            className="text-right text-red-400 px-4 underline text-sm mt-4 cursor-pointer"
+            onClick={() => {
+              setIsClearAction(true);
+              setShowActionModal(true);
+            }}
+          >
+            Clear wishlist
+          </p>
+          {favorites.map((item, i) => (
             <div className="px-4 flex gap-4 mt-8">
-              <img src={img} className="w-25 h-32 object-contain" alt="" />
+              <img
+                src={item.thumbnail}
+                className="w-25 h-32 object-contain"
+                alt=""
+              />
 
               <div className="flex-1">
                 <div className="mt-2">
-                  <p className="">Cosy Luxe Straight Leg Joggers</p>
+                  <p className="">{item.name}</p>
                 </div>
 
                 <div className="flex justify-between items-center mt-2">
-                  <p className="font-bold">$58.99</p>
+                  <p className="font-bold">
+                    {item.price.toLocaleString("en-NG", {
+                      style: "currency",
+                      currency: "NGN",
+                    })}
+                  </p>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <button
-                    className={`mt-4 rounded-3xl bg-[${themeColors.mainBlue}] text-white montserrat font-bold px-4 py-2 text-xs`}
+                    className={`mt-4 rounded-3xl bg-blue-800 text-white montserrat font-bold px-4 py-2 text-xs`}
+                    onClick={() => {
+                      navigate(`/product/${item.productId}`);
+                    }}
                   >
-                    ADD TO CART
+                    GO TO PRODUCT
                   </button>
 
-                  <div className="cursor-pointer">
-                    <Trash2 color={themeColors.lastCallRed} />
-                  </div>
+                  <Trash2
+                    onClick={() => {
+                      setShowActionModal(true);
+                      setActiveProduct(item);
+                    }}
+                    className="cursor-pointer"
+                    color={themeColors.lastCallRed}
+                  />
                 </div>
               </div>
             </div>
@@ -502,7 +545,9 @@ const Cart = () => {
               Are you sure you want to{" "}
               {isClearAction
                 ? `clear your ${cartSelected === 0 ? "cart" : "wishlist"}`
-                : "remove this item"}
+                : `remove this item from your ${
+                    cartSelected === 0 ? "cart" : "wishlist"
+                  }`}
             </p>
 
             <div className="flex justify-end gap-4">
@@ -522,18 +567,18 @@ const Cart = () => {
                   isClearAction
                     ? cartSelected === 0
                       ? clearCart()
-                      : console.log("clear wishlist")
+                      : clearFavorites()
                     : cartSelected === 0
                     ? removeProduct(
                         activeProduct.productId,
                         activeProduct.color,
                         activeProduct.size
                       )
-                    : console.log("remove");
+                    : removeFavorites(activeProduct.productId);
                 }}
                 className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-sm transition-colors"
               >
-                Delete
+                {isClearAction ? "Clear" : "Remove"}
               </button>
             </div>
           </div>

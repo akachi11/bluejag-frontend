@@ -13,8 +13,8 @@ const HomeProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
-  const toggleSideBar = () => {
-    setSideBarOpen(!sideBarOpen);
+  const toggleSideBar = (state) => {
+    setSideBarOpen(state ?? !sideBarOpen);
   };
 
   const logOut = () => {

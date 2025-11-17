@@ -15,7 +15,9 @@ import {
   SpecialInfo,
 } from "../Styles/HomeSlideStyles";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, HeartIcon } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import { IoHeart, IoHeartOutline } from "react-icons/io5";
 
 const HomeSlide = ({ title, products }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -24,6 +26,7 @@ const HomeSlide = ({ title, products }) => {
   const scrollContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const { favoriteItem, favIds, removeFavorites } = useCart();
   const navigate = useNavigate();
 
   // Scroll detection
@@ -122,6 +125,30 @@ const HomeSlide = ({ title, products }) => {
                     src={item.thumbnail}
                     alt={item.name}
                   />
+                  {favIds?.includes(item._id) ? (
+                    <IoHeart
+                      size={35}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFavorites(item._id);
+                      }}
+                      className="absolute top-2 right-2 text-white bg-[rgba(0,0,0,0.38)] rounded-full p-2 cursor-pointer"
+                    />
+                  ) : (
+                    <IoHeartOutline
+                      size={35}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        favoriteItem({
+                          name: item.name,
+                          price: item.price,
+                          thumbnail: item.thumbnail,
+                          _id: item._id,
+                        });
+                      }}
+                      className="absolute top-2 right-2 text-white bg-[rgba(0,0,0,0.38)] rounded-full p-2 cursor-pointer"
+                    />
+                  )}
                 </NewArrivalItemImgBg>
 
                 <NewArrivalItemDesc>

@@ -24,10 +24,10 @@ export const CompanyFooterInfo = styled.div`
 export const FooterContainer = styled.div`
   color: ${themeColors.white};
   font-size: 1rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1rem 5rem;
 
   @media only screen and (${devices.tablet}) {
-    padding: 2rem 4rem;
+    padding: 2rem 4rem 5rem;
   }
 `;
 
@@ -89,8 +89,6 @@ export const NewsletterEmailInput = styled.input`
 `;
 
 export const NewsletterEmailBtn = styled.button`
-  background-color: ${themeColors.lightestBlue};
-  color: ${themeColors.buttonTextBlue};
   font-family: "Montserrat", sans-serif;
   font-weight: 900;
   padding: 0.7rem;

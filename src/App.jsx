@@ -24,10 +24,13 @@ import AddressBook from "./containers/AddressBook";
 import OrderDetails from "./containers/OrderDetail";
 import Loyalty from "./containers/Loyalty";
 import FourZeroFour from "./containers/FourZeroFour";
+import { useCart } from "./context/CartContext";
+import PointsHistory from "./containers/PointsHistory";
 
 function App() {
-  const { isCartOpen, toggleCart, setLoggedIn, loggedIn, sideBarOpen } =
+  const { isCartOpen, toggleCart, setLoggedIn, loggedIn, toggleSideBar } =
     useHomeContext();
+  const { fetchFavorites, favorites } = useCart();
   const location = useLocation();
 
   const authRoutes = ["/signin", "/signup"];
@@ -49,7 +52,15 @@ function App() {
     } else {
       setLoggedIn(false);
     }
+
+    fetchFavorites();
   }, []);
+
+  useEffect(() => {
+    toggleCart(false);
+    toggleSideBar(false);
+    window.scrollTo(0, 0);
+  }, [window.location.pathname]);
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
@@ -61,7 +72,7 @@ function App() {
         </>
       )}
 
-      {sideBarOpen && <Sidebar />}
+      <Sidebar />
 
       <main className="grow">
         <Routes>
@@ -74,6 +85,7 @@ function App() {
           <Route path="/category/:cat" element={<CategoryPage />} />
           <Route path="/order/:oid" element={<OrderDetails />} />
           <Route path="/product/:pid" element={<ProductPage />} />
+          <Route path="/points-history" element={<PointsHistory />} />
 
           {/* Redirect logged-in users away from auth pages */}
           <Route

@@ -76,7 +76,7 @@ const Profile = () => {
   return (
     <div>
       {/* MOBILE PROFILE HERO */}
-      <div className="bg-gray-950 pt-16 lg:pt-8 lg:hidden">
+      <div className="bg-gray-950 pb-12 pt-16 lg:pt-8 lg:hidden">
         {loading ? (
           <MobileProfileSkeleton />
         ) : (
@@ -127,9 +127,15 @@ const Profile = () => {
           </>
         )}
 
-        <div className="montserrat uppercase font-semibold text-xs">
-          <p className="p-6">Rewards</p>
-          <p className="p-6">Points history</p>
+        <div className="montserrat bg-gray-950  uppercase font-semibold text-xs">
+          <p
+            className="p-6"
+            onClick={() => {
+              navigate("/points-history");
+            }}
+          >
+            Points history
+          </p>
           <p
             className="p-6"
             onClick={() => {
@@ -139,7 +145,14 @@ const Profile = () => {
             Loyalty overview
           </p>
           <hr className="border-zinc-800" />
-          <p className="p-6">Orders</p>
+          <p
+            className="p-6"
+            onClick={() => {
+              navigate("/orders");
+            }}
+          >
+            Orders
+          </p>
           <p
             className="p-6"
             onClick={() => {
@@ -148,17 +161,15 @@ const Profile = () => {
           >
             Address Book
           </p>
-          <p className="p-6">Returns</p>
           <p className="p-6">Refer a friend</p>
+          <button
+            className="flex gap-1 font-semibold underline ml-6 mt-4 items-center text-lg bg-red-800 px-4 py-2 rounded-2xl"
+            onClick={logOut}
+          >
+            <LogOut size={15} />
+            <p>Signout</p>
+          </button>
         </div>
-
-        <button
-          className="flex gap-1 text-sm font-semibold underline ml-6 mt-4 items-center"
-          onClick={logOut}
-        >
-          <LogOut size={15} />
-          <p>Signout</p>
-        </button>
       </div>
 
       {/* DESKTOP PROFILE HERO */}
@@ -173,10 +184,12 @@ const Profile = () => {
               <p className="font-semibold">CHIMADIKA</p>
 
               <div className="mt-4 w-full flex-1 flex items-start flex-col gap-1 text-xs font-semibold">
-                <button className="bg-blue-900 text-white py-2 px-4 w-full text-left">
-                  REWARDS
-                </button>
-                <button className="bg-blue-900 text-white py-2 px-4 w-full text-left">
+                <button
+                  onClick={() => {
+                    navigate("/points-history");
+                  }}
+                  className="bg-blue-900 text-white py-2 px-4 w-full text-left"
+                >
                   POINTS HISTORY
                 </button>
                 <button
