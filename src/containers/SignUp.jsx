@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import logo from "../assets/head-01-01.png";
 import FloatingInput from "../components/FloatingInput";
@@ -9,6 +9,12 @@ import { localHost, renderAPI } from "../constants";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // ⭐ NEW: Get referral code from URL
+  const referralFromURL = searchParams.get("ref");
+  const [refLocked] = useState(Boolean(referralFromURL));
+
   const [loading, setLoading] = useState(false);
   const [showEmailError, setShowEmailError] = useState(false);
 
@@ -18,11 +24,11 @@ const SignUp = () => {
     email: "",
     password: "",
     phone: "",
+    referralCode: referralFromURL || "", // ⭐ Auto-fill referral
   });
 
   const { setLoggedIn } = useHomeContext();
 
-  // ✅ Password requirement checks (live feedback)
   const passwordChecks = useMemo(() => {
     const { password } = signUpData;
     return {
@@ -32,22 +38,23 @@ const SignUp = () => {
     };
   }, [signUpData.password]);
 
-  const allFieldsFilled = Object.values(signUpData).every(
-    (val) => val.trim() !== ""
-  );
+  const allFieldsFilled = Object.values(signUpData)
+    .filter((_, i, arr) => i !== arr.length - 1)
+    .every((val) => val.trim() !== "");
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signUpData.email);
   const passwordValid =
     passwordChecks.hasUppercase &&
     passwordChecks.hasNumber &&
     passwordChecks.hasSpecialChar;
 
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signUpData.email);
   const isFormValid = allFieldsFilled && passwordValid && emailValid;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowEmailError(true); // show email error only after attempting submit
+    setShowEmailError(true);
 
-    if (!isFormValid) return; // stop submission if invalid
+    if (!isFormValid) return;
 
     setLoading(true);
     try {
@@ -57,15 +64,23 @@ const SignUp = () => {
         }/api/auth/register`,
         signUpData
       );
-      const { token, name, email } = res.data;
 
-      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+      const { token, name, email, referralCode } = res.data;
+
+      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
       localStorage.setItem(
         "bj_userData",
-        JSON.stringify({ token, name, email, expiry })
+        JSON.stringify({ token, name, email, referralCode, expiry })
       );
+
       setLoggedIn(true);
-      toast.success("Account created successfully!");
+
+      if (referralCode) {
+        toast.success(`Account created! Your referral code: ${referralCode}`);
+      } else {
+        toast.success("Account created successfully!");
+      }
+
       navigate("/");
     } catch (err) {
       toast.error(err.response?.data?.message || "Signup failed");
@@ -82,6 +97,7 @@ const SignUp = () => {
           className="w-[120px] h-[120px] object-contain m-auto mb-4"
           alt="BlueJag logo"
         />
+
         <p className="font-bold montserrat text-2xl">BLUEJAG SIGNUP</p>
         <p className="px-8 mt-4">One account. Unlimited benefits.</p>
 
@@ -109,7 +125,7 @@ const SignUp = () => {
             }
             label={"Email Address"}
           />
-          {/* Show email error ONLY after submit attempt */}
+
           {showEmailError && !emailValid && (
             <p className="text-red-500 text-xs mt-1 text-left">
               Please enter a valid email address
@@ -133,40 +149,30 @@ const SignUp = () => {
             isPassword
           />
 
-          {/* ✅ Live Password Requirement Card */}
-          <div className="bg-gray-800 rounded-lg p-3 mt-2 text-left text-sm shadow-sm">
-            <p className="font-semibold text-white mb-2">
-              Password must include:
-            </p>
-            <ul className="space-y-1">
-              <li
-                className={`flex items-center gap-2 ${
-                  passwordChecks.hasUppercase
-                    ? "text-green-600"
-                    : "text-gray-400"
-                }`}
-              >
-                {passwordChecks.hasUppercase ? "✅" : "❌"} At least one capital
-                letter
-              </li>
-              <li
-                className={`flex items-center gap-2 ${
-                  passwordChecks.hasNumber ? "text-green-600" : "text-gray-400"
-                }`}
-              >
-                {passwordChecks.hasNumber ? "✅" : "❌"} At least one number
-              </li>
-              <li
-                className={`flex items-center gap-2 ${
-                  passwordChecks.hasSpecialChar
-                    ? "text-green-600"
-                    : "text-gray-400"
-                }`}
-              >
-                {passwordChecks.hasSpecialChar ? "✅" : "❌"} At least one
-                special character
-              </li>
-            </ul>
+          {/* Referral Code (Auto-Locked if came from URL) */}
+          <div className="mt-4">
+            <FloatingInput
+              value={signUpData.referralCode}
+              onChange={(e) =>
+                !refLocked &&
+                setSignUpData({
+                  ...signUpData,
+                  referralCode: e.target.value.toUpperCase(),
+                })
+              }
+              disabled={refLocked} // ⭐ USER CAN’T EDIT IF URL PROVIDED IT
+              label={
+                refLocked
+                  ? "Referral Code (Auto-applied)"
+                  : "Referral Code (Optional)"
+              }
+            />
+
+            {!refLocked && (
+              <p className="text-xs text-gray-400 mt-1 text-left">
+                Have a referral? Enter it here!
+              </p>
+            )}
           </div>
 
           <button
@@ -176,7 +182,7 @@ const SignUp = () => {
               isFormValid
                 ? "bg-blue-800 hover:bg-blue-900"
                 : "bg-blue-300 cursor-not-allowed"
-            } text-white montserrat font-bold px-8 py-4 text-sm m-auto w-[80%] max-w-[300px] transition-all duration-200`}
+            } text-white font-bold px-8 py-4 text-sm m-auto w-[80%] transition-all duration-200`}
           >
             {loading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
           </button>
@@ -186,7 +192,7 @@ const SignUp = () => {
           Already have an account?{" "}
           <strong
             onClick={() => navigate("/signin")}
-            className="underline montserrat cursor-pointer"
+            className="underline cursor-pointer"
           >
             Log in
           </strong>

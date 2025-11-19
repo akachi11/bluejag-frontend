@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// components/PointsHistory.jsx
+import React, { useState, useEffect } from "react";
 import {
   Trophy,
   ShoppingBag,
@@ -8,97 +9,69 @@ import {
   TrendingUp,
   Calendar,
   Zap,
+  Loader2,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
+import { localHost, renderAPI } from "../constants";
+import axios from "axios";
+import { getTierInfo } from "../Constants/Tiers";
 
 const PointsHistory = () => {
-  // Mock data - replace with actual API call
-  const [pointsData] = useState({
-    totalPoints: 2450,
-    lifetimePoints: 5780,
-    currentTier: "Gold",
-    history: [
-      {
-        id: 1,
-        action: "Purchase",
-        description: "Lift Seamless Two Piece",
-        points: 403,
-        date: "2025-11-15",
-        icon: "shopping",
-      },
-      {
-        id: 2,
-        action: "Referral",
-        description: "Friend joined using your code",
-        points: 500,
-        date: "2025-11-12",
-        icon: "users",
-      },
-      {
-        id: 3,
-        action: "Purchase",
-        description: "Everyday Tank",
-        points: 134,
-        date: "2025-11-10",
-        icon: "shopping",
-      },
-      {
-        id: 4,
-        action: "Event Task",
-        description: 'Completed "Summer Fitness Challenge"',
-        points: 150,
-        date: "2025-11-09",
-        icon: "event",
-      },
-      {
-        id: 5,
-        action: "Review",
-        description: "Product review submitted",
-        points: 50,
-        date: "2025-11-08",
-        icon: "star",
-      },
-      {
-        id: 6,
-        action: "Birthday Bonus",
-        description: "Happy Birthday from BlueJag!",
-        points: 200,
-        date: "2025-11-01",
-        icon: "gift",
-      },
-      {
-        id: 7,
-        action: "Purchase",
-        description: "Performance Shorts",
-        points: 289,
-        date: "2025-10-28",
-        icon: "shopping",
-      },
-      {
-        id: 8,
-        action: "Event Task",
-        description: 'Completed "New Year Kickoff" milestone',
-        points: 100,
-        date: "2025-10-26",
-        icon: "event",
-      },
-      {
-        id: 9,
-        action: "Social Share",
-        description: "Shared on Instagram",
-        points: 25,
-        date: "2025-10-25",
-        icon: "trending",
-      },
-      {
-        id: 10,
-        action: "Referral",
-        description: "Friend made first purchase",
-        points: 250,
-        date: "2025-10-20",
-        icon: "users",
-      },
-    ],
+  const [pointsData, setPointsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+  const [tierInfo, setTierInfo] = useState({
+    currentTier: "",
+    nextTier: "",
+    currentXP: 0,
+    totalXP: 0,
+    xpToGo: 0,
+    percent: 0,
+    img: "",
   });
+
+  const userData = JSON.parse(localStorage.getItem("bj_userData"));
+  const token = userData?.token;
+
+  // Fetch points history from API
+  const fetchPointsHistory = async (page = 1) => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${
+          location.origin.includes("localhost") ? localHost : renderAPI
+        }/api/user/points-history`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = res.data;
+
+      if (result.success) {
+        setPointsData(result.data);
+        setPagination(result.data.pagination);
+        setError(null);
+      } else {
+        throw new Error(result.message || "Failed to load points");
+      }
+    } catch (err) {
+      console.error("Error fetching points:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPointsHistory(currentPage);
+  }, [currentPage]);
 
   const getIcon = (iconType) => {
     const icons = {
@@ -143,6 +116,48 @@ const PointsHistory = () => {
     }
   };
 
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination?.totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  useEffect(() => {
+    const info = getTierInfo(pointsData?.totalPoints);
+    setTierInfo(info);
+  }, [pointsData]);
+
+  // Loading state
+  if (loading && !pointsData) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white font-['Montserrat'] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-500 mx-auto mb-4" />
+          <p className="text-gray-400">Loading your points history...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white font-['Montserrat'] flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Oops! Something went wrong</h2>
+          <p className="text-gray-400 mb-4">{error}</p>
+          <button
+            onClick={() => fetchPointsHistory(currentPage)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 text-white font-['Montserrat']">
       {/* Header */}
@@ -159,32 +174,19 @@ const PointsHistory = () => {
           <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
             <div className="flex items-center gap-3 mb-2">
               <Trophy className="w-5 h-5 text-yellow-500" />
-              <p className="text-sm text-gray-400">Current Points</p>
+              <p className="text-sm text-gray-400">Total XP</p>
             </div>
             <p className="text-3xl font-bold">
-              {pointsData.totalPoints.toLocaleString()}
+              {pointsData?.totalPoints?.toLocaleString() || 0} XP
             </p>
-            <p className="text-xs text-gray-500 mt-1">XP</p>
           </div>
 
           <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
             <div className="flex items-center gap-3 mb-2">
               <Star className="w-5 h-5 text-purple-500" />
-              <p className="text-sm text-gray-400">Tier Status</p>
+              <p className="text-sm text-gray-400">Current Tier</p>
             </div>
-            <p className="text-3xl font-bold">{pointsData.currentTier}</p>
-            <p className="text-xs text-gray-500 mt-1">Member</p>
-          </div>
-
-          <div className="bg-gray-900 rounded-lg p-6 border border-gray-800">
-            <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-5 h-5 text-green-500" />
-              <p className="text-sm text-gray-400">Lifetime Points</p>
-            </div>
-            <p className="text-3xl font-bold">
-              {pointsData.lifetimePoints.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">XP Earned</p>
+            <img className="w-15" src={tierInfo.img} alt="" />
           </div>
         </div>
 
@@ -197,49 +199,88 @@ const PointsHistory = () => {
             </div>
           </div>
 
-          <div className="divide-y divide-gray-800">
-            {pointsData.history.map((item) => (
-              <div
-                key={item.id}
-                className="p-6 hover:bg-gray-800/50 transition-colors"
-              >
-                <div className="flex items-start gap-4">
-                  {/* Icon */}
+          {pointsData?.history?.length > 0 ? (
+            <>
+              <div className="divide-y divide-gray-800">
+                {pointsData.history.map((item) => (
                   <div
-                    className={`${getIconBg(
-                      item.icon
-                    )} rounded-full p-3 text-white flex-shrink-0`}
+                    key={item.id}
+                    className="p-6 hover:bg-gray-800/50 transition-colors"
                   >
-                    {getIcon(item.icon)}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h3 className="font-semibold text-white mb-1">
-                          {item.action}
-                        </h3>
-                        <p className="text-sm text-gray-400">
-                          {item.description}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-2">
-                          {formatDate(item.date)}
-                        </p>
+                    <div className="flex items-start gap-4">
+                      {/* Icon */}
+                      <div
+                        className={`${getIconBg(
+                          item.icon
+                        )} rounded-full p-3 text-white flex-shrink-0`}
+                      >
+                        {getIcon(item.icon)}
                       </div>
 
-                      {/* Points Badge */}
-                      <div className="flex-shrink-0">
-                        <div className="bg-blue-900 text-white px-4 py-2 rounded-full font-bold">
-                          +{item.points} XP
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <h3 className="font-semibold text-white mb-1">
+                              {item.action}
+                            </h3>
+                            <p className="text-sm text-gray-400">
+                              {item.description}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-2">
+                              {formatDate(item.date)}
+                            </p>
+                          </div>
+
+                          {/* Points Badge */}
+                          <div className="flex-shrink-0">
+                            <div className="bg-blue-900 text-white px-4 py-2 rounded-full font-bold">
+                              +{item.points} XP
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+
+              {/* Pagination */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="p-6 border-t border-gray-800 flex items-center justify-between">
+                  <div className="text-sm text-gray-400">
+                    Page {pagination.currentPage} of {pagination.totalPages}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1 || loading}
+                      className="p-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={
+                        currentPage === pagination.totalPages || loading
+                      }
+                      className="p-2 rounded-lg bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="p-12 text-center text-gray-400">
+              <Trophy className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p className="text-lg font-semibold mb-2">No activity yet</p>
+              <p className="text-sm">
+                Start earning points by making purchases and completing tasks!
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Info Box */}
@@ -255,24 +296,17 @@ const PointsHistory = () => {
             <li className="flex items-start gap-2">
               <span className="text-blue-500 mt-1">•</span>
               <span>
-                <strong>Refer Friends:</strong> Get 500 XP when they sign up +
-                250 XP on their first order
+                <strong>Refer Friends:</strong> Get 250 XP when they sign up +
+                150 XP on their first order
               </span>
             </li>
-            <li className="flex items-start gap-2">
+            {/* <li className="flex items-start gap-2">
               <span className="text-blue-500 mt-1">•</span>
               <span>
                 <strong>Leave Reviews:</strong> Share your thoughts and earn 50
                 XP per review
               </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-1">•</span>
-              <span>
-                <strong>Social Sharing:</strong> Post about BlueJag and tag us
-                for 25 XP
-              </span>
-            </li>
+            </li> */}
             <li className="flex items-start gap-2">
               <span className="text-blue-500 mt-1">•</span>
               <span>

@@ -66,8 +66,8 @@ const Loyalty = () => {
       <div className="flex flex-col lg:flex-row gap-8 mb-12">
         {/* Left: Active XP Events */}
         <div className="flex-3 bg-gray-900 p-6 rounded-xl shadow-lg">
-          <h3 className="font-semibold text-lg mb-4">Active XP Events</h3>
-          <div className="relative">
+          <h3 className="font-semibold text-lg mb-4">No active XP Events</h3>
+          {/* <div className="relative">
             <div className="relative">
               <div
                 ref={scrollRef}
@@ -103,11 +103,11 @@ const Loyalty = () => {
                 </div>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Right: Always Earn XP */}
-        <div className=" bg-gray-900 flex-2 h-fit p-6 rounded-xl shadow-lg">
+        {/* <div className=" bg-gray-900 flex-2 h-fit p-6 rounded-xl shadow-lg">
           <h3 className="font-semibold text-lg mb-4">Always Earn XP</h3>
           <div className="flex flex-col gap-3">
             {alwaysEarnXP.map((item, i) => (
@@ -122,7 +122,7 @@ const Loyalty = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Tiers Section */}

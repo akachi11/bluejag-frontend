@@ -20,7 +20,7 @@ export const TIERS = [
     },
     {
         name: "Tier 2",
-        xp: 500,
+        xp: 1250,
         img: tier2img,
         benefits: [
             "10% Birthday Reward",
@@ -31,7 +31,7 @@ export const TIERS = [
     },
     {
         name: "Tier 3",
-        xp: 1250,
+        xp: 3000,
         img: tier3img,
         benefits: [
             "15% Birthday Reward",
@@ -42,7 +42,7 @@ export const TIERS = [
     },
     {
         name: "Tier 4",
-        xp: 2500,
+        xp: 5000,
         img: tier4img,
         benefits: [
             "20% Birthday Reward",
@@ -80,6 +80,7 @@ export const getTierInfo = (currentXP) => {
         percent,
         benefits: currentTier.benefits,
         nextTierBenefits: nextTier.benefits,
+        img: currentTier.img
     };
 };
 

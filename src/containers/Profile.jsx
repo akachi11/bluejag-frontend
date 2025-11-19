@@ -16,6 +16,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { getTierInfo } from "../Constants/Tiers";
 import noAddrImg from "../assets/no-address.png";
+import ReferralModal from "../components/ReferralModal";
 
 const Profile = () => {
   const { logOut } = useHomeContext();
@@ -30,8 +31,10 @@ const Profile = () => {
     totalXP: 0,
     xpToGo: 0,
     percent: 0,
+    img: "",
   });
   const [mainAddress, setMainAddress] = useState();
+  const [referralModal, setReferralModal] = useState(false);
 
   const userData = JSON.parse(localStorage.getItem("bj_userData"));
   const token = userData?.token;
@@ -119,7 +122,7 @@ const Profile = () => {
 
             <div className="mt-8 h-30 overflow-hidden">
               <img
-                src={tier1img}
+                src={tierInfo.img}
                 alt=""
                 className="w-[60%] m-auto object-top object-cover"
               />
@@ -161,7 +164,9 @@ const Profile = () => {
           >
             Address Book
           </p>
-          <p className="p-6">Refer a friend</p>
+          <p className="p-6" onClick={() => setReferralModal(true)}>
+            Refer a friend
+          </p>
           <button
             className="flex gap-1 font-semibold underline ml-6 mt-4 items-center text-lg bg-red-800 px-4 py-2 rounded-2xl"
             onClick={logOut}
@@ -230,7 +235,7 @@ const Profile = () => {
 
               <div className="mt-8 h-30 lg:h-40 xl:h-60 overflow-hidden">
                 <img
-                  src={tier1img}
+                  src={tierInfo.img}
                   alt=""
                   className="w-[30%] lg:w-full m-auto object-top object-cover"
                 />
@@ -337,6 +342,15 @@ const Profile = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {referralModal && (
+        <ReferralModal
+          isOpen={referralModal}
+          onClose={() => setReferralModal(false)}
+          userName={userInfo.firstName}
+          referralCode={userInfo.referralCode}
+        />
       )}
     </div>
   );
