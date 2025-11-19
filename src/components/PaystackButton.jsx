@@ -53,7 +53,13 @@ const PayButton = ({
         alt="Paystack"
         className="w-5 h-5 object-contain"
       />
-      <span>Pay Securely with Paystack</span>
+      <span>
+        Pay{" "}
+        {(amount / 100).toLocaleString("en-NG", {
+          style: "currency",
+          currency: "NGN",
+        })}
+      </span>
     </button>
   );
 };
