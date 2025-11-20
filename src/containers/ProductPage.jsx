@@ -17,14 +17,11 @@ import {
   ProductTop,
   ProductValue,
   ProductsAccordionContainer,
-  RatingSection,
   SizeBox,
   SizeTop,
   SizesFlexbox,
 } from "../Styles/ProductPage";
 import ImageSlider from "../components/ImagesSlider";
-import { GoBookmarkSlash } from "react-icons/go";
-import { GoBookmarkFill } from "react-icons/go";
 import { IconContainer } from "../Styles/ComponentStyles";
 import { SpecialInfo } from "../Styles/HomeSlideStyles";
 import BigButton from "../components/BigButton";
@@ -39,6 +36,7 @@ import ProductSkeleton from "../components/ProductPageSkeleton";
 import { toast } from "react-toastify";
 import { useHomeContext } from "../context/HomeContext";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
+import ReviewsSection from "../components/ReviewSection";
 
 const ProductPage = () => {
   const [openAccordion, setOpenAccordion] = useState();
@@ -472,6 +470,8 @@ const ProductPage = () => {
           </button>
         </div>
       )}
+
+      {!loading && product && <ReviewsSection productId={product._id} />}
 
       <HomeSlide title={"Throw in one or two"} />
       <GoinBlue />
