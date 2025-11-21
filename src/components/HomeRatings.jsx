@@ -103,7 +103,7 @@ const HomeRatings = () => {
             Testimonials
           </p>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-            What Our Athletes Say
+            What Our Customers Say
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto mt-6 rounded-full" />
         </div>
