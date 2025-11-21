@@ -473,7 +473,7 @@ const ProductPage = () => {
 
       {!loading && product && <ReviewsSection productId={product._id} />}
 
-      <HomeSlide title={"Throw in one or two"} />
+      {/* <HomeSlide title={"Throw in one or two"} /> */}
       <GoinBlue />
       {/* <RatingSection>
         <RatingSummary ratings={Ratings} />

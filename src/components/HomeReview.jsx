@@ -32,7 +32,7 @@ const HomeReview = () => {
       <div className="relative z-10 flex h-full flex-col justify-end items-start text-left max-w-[80%] sm:max-w-[60%] px-6 py-10 md:py-12 md:justify-center md:items-center md:text-center md:w-1/2 md:max-w-none">
         <div className="flex text-xl sm:text-2xl mb-2">{stars}</div>
 
-        <p className="font-serif text-sm sm:text-base mb-2 leading-snug lg:text-xl px-8">
+        <p className="font-serif text-sm sm:text-base mb-2 leading-snug lg:text-xl lg:px-8">
           "I tried the other black active wear and I was wowed by the quality,
           you can literally see the intentionality in the cloth, the fit, the
           straps and how snug it is. You did your big one on this 🫶🏿🫶🏿.
