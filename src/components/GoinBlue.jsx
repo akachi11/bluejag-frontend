@@ -114,7 +114,7 @@ const GoinBlue = () => {
       {/* CTA */}
       <div className="mt-8 text-center px-4">
         <a
-          href="https://instagram.com/bluejag"
+          href="https://instagram.com/bluejagco"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white font-semibold rounded-xl hover:opacity-90 transition-opacity"
