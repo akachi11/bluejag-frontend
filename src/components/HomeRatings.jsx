@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Quote } from "lucide-react";
 
@@ -57,10 +57,11 @@ const HomeRatings = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef(null);
 
+  // Desktop-only drag handlers
   const handleMouseDown = (e) => {
-    e.preventDefault();
     setIsDragging(true);
     setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
     setScrollLeft(scrollContainerRef.current.scrollLeft);
@@ -77,20 +78,24 @@ const HomeRatings = () => {
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  // Touch events for mobile
-  const handleTouchStart = (e) => {
-    setStartX(e.touches[0].pageX - scrollContainerRef.current.offsetLeft);
-    setScrollLeft(scrollContainerRef.current.scrollLeft);
-  };
+  // Track active card on scroll
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-  const handleTouchMove = (e) => {
-    const x = e.touches[0].pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
-  };
+    const handleScroll = () => {
+      const scrollPos = container.scrollLeft;
+      const cardWidth = container.scrollWidth / ratings.length;
+      const index = Math.round(scrollPos / cardWidth);
+      setActiveIndex(Math.min(index, ratings.length - 1));
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <section className="py-16 md:py-24 bg-linear-to-b from-[#0a0f1a] to-[#0f172a]">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-[#0a0f1a] to-[#0f172a]">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
@@ -98,9 +103,9 @@ const HomeRatings = () => {
             Testimonials
           </p>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-            What Our Customers Say
+            What Our Athletes Say
           </h2>
-          <div className="w-20 h-1 bg-linear-to-r from-blue-500 to-indigo-500 mx-auto mt-6 rounded-full" />
+          <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 mx-auto mt-6 rounded-full" />
         </div>
 
         {/* Ratings Carousel */}
@@ -110,26 +115,25 @@ const HomeRatings = () => {
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          className={`flex gap-5 md:gap-6 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide ${
+          className={`flex gap-5 md:gap-6 overflow-x-auto pb-6 snap-x snap-mandatory select-none ${
             isDragging ? "cursor-grabbing" : "cursor-grab"
           }`}
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
             WebkitOverflowScrolling: "touch",
+            scrollBehavior: "smooth",
           }}
         >
           {ratings.map((rating, index) => (
             <div
               key={rating.id}
-              className="group relative shrink-0 w-[85%] sm:w-[45%] lg:w-[30%] snap-start"
+              className="group relative flex-shrink-0 w-[85%] sm:w-[45%] lg:w-[30%] snap-start"
             >
-              <div className="relative h-full p-6 md:p-8 rounded-2xl bg-linear-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/50 backdrop-blur-sm transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/5">
+              <div className="relative h-full p-6 md:p-8 rounded-2xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/50 backdrop-blur-sm transition-all duration-300 hover:border-blue-500/30 hover:shadow-xl hover:shadow-blue-500/5">
                 {/* Quote Icon */}
                 <div className="absolute -top-4 -left-2 md:-left-3">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
                     <Quote className="w-5 h-5 md:w-6 md:h-6 text-white" />
                   </div>
                 </div>
@@ -155,7 +159,7 @@ const HomeRatings = () => {
                         Verified Buyer
                       </p>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
                       {rating.reviewer.charAt(0)}
                     </div>
                   </div>
@@ -171,7 +175,7 @@ const HomeRatings = () => {
                         {rating.product}
                       </span>
                       <svg
-                        className="w-3 h-3 ml-auto shrink-0 opacity-0 -translate-x-2 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all"
+                        className="w-3 h-3 ml-auto flex-shrink-0 opacity-0 -translate-x-2 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -204,7 +208,11 @@ const HomeRatings = () => {
                   behavior: "smooth",
                 });
               }}
-              className="w-2 h-2 rounded-full bg-slate-700 hover:bg-blue-500 transition-colors"
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                activeIndex === index
+                  ? "bg-blue-500 w-6"
+                  : "bg-slate-700 hover:bg-slate-600"
+              }`}
               aria-label={`Go to review ${index + 1}`}
             />
           ))}
