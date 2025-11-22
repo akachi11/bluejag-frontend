@@ -219,7 +219,7 @@ const Sidebar = () => {
             </div>
 
             {/* Footer Actions */}
-            <div className="border-t border-slate-800 p-4 pb-8 bg-[#070a10]">
+            <div className="border-t border-slate-800 p-4 pb-16 bg-[#070a10]">
               <div className="grid grid-cols-2 gap-3">
                 {!loggedIn ? (
                   <button
