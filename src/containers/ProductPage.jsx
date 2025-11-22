@@ -184,7 +184,7 @@ const ProductPage = () => {
           {/* Images Skeleton */}
           <div className="space-y-4">
             <SkeletonBase className="w-full aspect-[3/4] rounded-2xl" />
-            <div className="flex gap-3">
+            <div className="flex gap-3 overflow-x-auto">
               {[...Array(4)].map((_, i) => (
                 <SkeletonBase
                   key={i}
@@ -232,7 +232,7 @@ const ProductPage = () => {
   if (!product) return null;
 
   return (
-    <div className="min-h-screen bg-[#0a0f1a] text-white">
+    <div className="min-h-screen max-w-screen bg-[#0a0f1a] text-white">
       <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-6 lg:py-10">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
@@ -256,12 +256,12 @@ const ProductPage = () => {
           </span>
         </nav>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid max-w-full lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Left - Images */}
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-x-auto">
             {/* Main Image */}
             <div
-              className="relative aspect-[3/4] bg-slate-900 rounded-2xl cursor-zoom-in group"
+              className="relative aspect-[3/4] bg-slate-900 rounded-2xl cursor-zoom-in group overflow-hidden"
               onClick={() => {
                 setPreviewIndex(activeImageIndex);
                 setPreviewOpen(true);
@@ -270,7 +270,7 @@ const ProductPage = () => {
               <img
                 src={images[activeImageIndex]}
                 alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
 
               {/* Limited Edition Badge */}
@@ -302,25 +302,27 @@ const ProductPage = () => {
               </div>
             </div>
 
-            {/* Thumbnails */}
-            <div className="flex gap-3 pb-2 scrollbar-hide">
-              {images.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveImageIndex(i)}
-                  className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all ${
-                    activeImageIndex === i
-                      ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0a0f1a]"
-                      : "opacity-60 hover:opacity-100"
-                  }`}
-                >
-                  <img
-                    src={img}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
+            {/* Thumbnails - FIXED */}
+            <div className="overflow-x-auto p-2">
+              <div className="flex gap-3 min-w-min">
+                {images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImageIndex(i)}
+                    className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all ${
+                      activeImageIndex === i
+                        ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0a0f1a]"
+                        : "opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Desktop: Description Image */}
