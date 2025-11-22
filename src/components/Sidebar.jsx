@@ -96,7 +96,7 @@ const Sidebar = () => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed pb-16 left-0 top-0 z-50 h-screen w-full md:w-[380px] lg:hidden bg-[#0a0f1a] text-white flex flex-col"
+            className="fixed min-h-screen overflow-y-auto left-0 top-0 z-50 w-full md:w-[380px] lg:hidden bg-[#0a0f1a] text-white flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -111,7 +111,7 @@ const Sidebar = () => {
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="min-h-[50%] overflow-y-auto">
               {/* Main Navigation */}
               <nav className="p-4">
                 {menuItems.map((item) => (
