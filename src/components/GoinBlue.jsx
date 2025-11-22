@@ -14,12 +14,12 @@ const GoinBlue = () => {
   const scrollRef = useRef(null);
 
   const photos = [
-    { src: photo1, username: "@bluejag.athlete" },
-    { src: photo2, username: "@fitnessjane" },
-    { src: photo3, username: "@gym.lifestyle" },
-    { src: photo4, username: "@trainwithme" },
-    { src: photo5, username: "@activelife" },
-    { src: photo6, username: "@bluejag.official" },
+    { src: photo1 },
+    { src: photo2 },
+    { src: photo3 },
+    { src: photo4 },
+    { src: photo5 },
+    { src: photo6 },
   ];
 
   const handleMouseDown = (e) => {
@@ -98,12 +98,12 @@ const GoinBlue = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
 
             {/* Hover Content */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+            {/* <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
               <Instagram size={32} className="text-white mb-2" />
               <span className="text-white text-sm font-medium">
                 {photo.username}
               </span>
-            </div>
+            </div> */}
 
             {/* Corner Gradient */}
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

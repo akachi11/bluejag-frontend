@@ -26,24 +26,24 @@ const Sidebar = () => {
     {
       id: "men",
       label: "Men",
-      links: [
-        { label: "View All", href: "/category/men" },
-        { label: "Bestsellers", href: "/category/men/bestsellers" },
-        { label: "New Arrivals", href: "/category/men/new" },
-        { label: "Compression", href: "/category/compression" },
-        { label: "Hoodies", href: "/category/hoodies" },
-      ],
+      // links: [
+      //   { label: "View All", href: "/category/men" },
+      //   { label: "Bestsellers", href: "/category/men/bestsellers" },
+      //   { label: "New Arrivals", href: "/category/men/new" },
+      //   { label: "Compression", href: "/category/compression" },
+      //   { label: "Hoodies", href: "/category/hoodies" },
+      // ],
     },
     {
       id: "women",
       label: "Women",
-      links: [
-        { label: "View All", href: "/category/women" },
-        { label: "Bestsellers", href: "/category/women/bestsellers" },
-        { label: "New Arrivals", href: "/category/women/new" },
-        { label: "Sports Bras", href: "/category/sports-bras" },
-        { label: "Leggings", href: "/category/leggings" },
-      ],
+      // links: [
+      //   { label: "View All", href: "/category/women" },
+      //   { label: "Bestsellers", href: "/category/women/bestsellers" },
+      //   { label: "New Arrivals", href: "/category/women/new" },
+      //   { label: "Sports Bras", href: "/category/sports-bras" },
+      //   { label: "Leggings", href: "/category/leggings" },
+      // ],
     },
   ];
 
@@ -115,7 +115,11 @@ const Sidebar = () => {
               {/* Main Navigation */}
               <nav className="p-4">
                 {menuItems.map((item) => (
-                  <div key={item.id} className="border-b border-slate-800/50">
+                  <div
+                    onClick={() => navigate(`/category/${item.id}`)}
+                    key={item.id}
+                    className="border-b border-slate-800/50"
+                  >
                     <button
                       onClick={() =>
                         setOpenMenu(openMenu === item.id ? null : item.id)
@@ -125,15 +129,15 @@ const Sidebar = () => {
                       <span className="text-lg font-semibold">
                         {item.label}
                       </span>
-                      <ChevronRight
+                      {/* <ChevronRight
                         size={20}
                         className={`text-slate-400 transition-transform duration-300 ${
                           openMenu === item.id ? "rotate-90" : ""
                         }`}
-                      />
+                      /> */}
                     </button>
 
-                    <AnimatePresence>
+                    {/* <AnimatePresence>
                       {openMenu === item.id && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
@@ -159,7 +163,7 @@ const Sidebar = () => {
                           </div>
                         </motion.div>
                       )}
-                    </AnimatePresence>
+                    </AnimatePresence> */}
                   </div>
                 ))}
 
@@ -175,7 +179,7 @@ const Sidebar = () => {
                 </button>
 
                 <button
-                  onClick={() => handleNavigate("/pre-order")}
+                  onClick={clickedComingSoon}
                   className="w-full flex items-center gap-3 py-4 border-b border-slate-800/50"
                 >
                   <Clock size={18} className="text-slate-500" />

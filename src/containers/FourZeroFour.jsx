@@ -13,10 +13,10 @@ const FourZeroFour = () => {
         alt=""
       />
       <button
-        className="bg-blue-950 montserrat px-8 py-4 rounded-3xl font-semibold"
         onClick={() => {
           navigate("/");
         }}
+        className="m-auto group flex items-center justify-center gap-2 px-6 md:px-8 py-3.5 md:py-4 bg-white text-black font-semibold rounded-xl hover:bg-slate-100 transition-all"
       >
         Back to Homepage
       </button>

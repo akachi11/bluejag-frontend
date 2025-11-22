@@ -10,7 +10,7 @@ const HomeReview = () => {
   const review = {
     rating: 5.0,
     text: "I tried the other black active wear and I was wowed by the quality, you can literally see the intentionality in the cloth, the fit, the straps and how snug it is. You did your big one on this 🫶🏿🫶🏿. Whatever you're doing, keep on doing it and do it better!",
-    author: "Alexandra",
+    author: "Adaugo, A.",
     location: "Lagos, NG",
     productId: "6905e6111b437ceae910cbd3",
     productName: "Black Active Set",

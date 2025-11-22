@@ -33,12 +33,12 @@ const Footer = () => {
     { label: "Limited Edition", href: "/category/limited" },
   ];
 
-  const supportLinks = [
-    { label: "Track Order", href: "/track" },
-    { label: "Shipping Info", href: "/shipping" },
-    { label: "Returns & Exchanges", href: "/returns" },
-    { label: "Size Guide", href: "/size-guide" },
-  ];
+  // const supportLinks = [
+  //   { label: "Track Order", href: "/track" },
+  //   { label: "Shipping Info", href: "/shipping" },
+  //   { label: "Returns & Exchanges", href: "/returns" },
+  //   { label: "Size Guide", href: "/size-guide" },
+  // ];
 
   const handleTrackOrder = () => {
     if (trackingId.length >= 6) {
@@ -50,7 +50,7 @@ const Footer = () => {
     <footer className="bg-[#070a10] text-white">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12 pt-16 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-8">
           {/* Brand Column */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
@@ -103,7 +103,7 @@ const Footer = () => {
           </div>
 
           {/* Support Links */}
-          <div>
+          {/* <div>
             <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">
               Support
             </h4>
@@ -119,7 +119,7 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
           {/* Track Order */}
           <div>

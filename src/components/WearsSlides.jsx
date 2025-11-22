@@ -15,21 +15,21 @@ const WearsSlides = () => {
       tag: "Lifestyle",
       title: "Everyday Fits That Slay",
       description: "Made for Her Hustle",
-      link: "/category/lifestyle",
+      link: "/category/women",
     },
     {
       image: img1,
       tag: "Performance",
       title: "Train Hard",
       description: "Look Harder",
-      link: "/category/performance",
+      link: "/category/men",
     },
     {
       image: img2,
       tag: "Athleisure",
       title: "Keep It Hot",
       description: "Too Cute to Quit",
-      link: "/category/athleisure",
+      link: "/category/women",
     },
   ];
 

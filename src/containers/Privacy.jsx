@@ -1,156 +1,386 @@
-// src/containers/PrivacyPage.jsx
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  ChevronDown,
+  ChevronUp,
+  Shield,
+  Eye,
+  Database,
+  Share2,
+  Cookie,
+  UserCheck,
+  Lock,
+  RefreshCw,
+  Mail,
+  Phone,
+} from "lucide-react";
 
 const PrivacyPage = () => {
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-3xl sm:text-4xl font-bold mb-6 text-center">
-        BlueJag Privacy Notice
-      </h1>
-      <p className="mb-4 text-gray-300">Last updated: 8 Nov 2025</p>
+  const [openSection, setOpenSection] = useState(null);
 
-      <section className="mb-6">
-        <h2 className="font-semibold text-lg mb-2">1. Scope of this notice</h2>
-        <p className="text-gray-300 mb-1">
-          This privacy notice applies to you if you interact with BlueJag
-          through our website, including:
-        </p>
-        <ul className="list-disc list-inside text-gray-300 mb-2">
-          <li>Purchasing products from our website</li>
-          <li>Signing up for newsletters or marketing emails</li>
-          <li>Participating in promotions or competitions</li>
-          <li>Interacting with us on social media</li>
-          <li>Submitting inquiries via our contact forms</li>
-        </ul>
-        <p className="text-gray-300">
-          It explains how we collect, use, store, and protect your personal
-          information.
-        </p>
-      </section>
-
-      <section className="mb-6">
-        <h2 className="font-semibold text-lg mb-2">
-          2. Information we collect
-        </h2>
-        <p className="text-gray-300 mb-1">
-          We may collect personal information including:
-        </p>
-        <ul className="list-disc list-inside text-gray-300 mb-2">
-          <li>Name, email, phone number, and delivery address</li>
-          <li>Payment information for processing orders</li>
-          <li>
-            Interaction data such as browsing behavior, clicks, and page visits
+  const sections = [
+    {
+      icon: Eye,
+      title: "Scope of this notice",
+      content: (
+        <>
+          <p className="mb-3">
+            This privacy notice applies to you if you interact with BlueJag
+            through our website, including:
+          </p>
+          <ul className="space-y-2 mb-3">
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Purchasing products from our website
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Signing up for newsletters or marketing emails
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Participating in promotions or competitions
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Interacting with us on social media
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Submitting inquiries via our contact forms
+            </li>
+          </ul>
+          <p>
+            It explains how we collect, use, store, and protect your personal
+            information.
+          </p>
+        </>
+      ),
+    },
+    {
+      icon: Database,
+      title: "Information we collect",
+      content: (
+        <>
+          <p className="mb-3">We may collect personal information including:</p>
+          <ul className="space-y-2 mb-3">
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Name, email, phone number, and delivery address
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Payment information for processing orders
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Interaction data such as browsing behavior, clicks, and page
+              visits
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Marketing preferences
+            </li>
+          </ul>
+          <p>
+            We do not collect more information than necessary to provide our
+            services or improve your experience.
+          </p>
+        </>
+      ),
+    },
+    {
+      icon: Database,
+      title: "How we use your information",
+      content: (
+        <ul className="space-y-2">
+          <li className="flex items-start gap-2">
+            <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+            To process and fulfill orders
           </li>
-          <li>Marketing preferences</li>
-        </ul>
-        <p className="text-gray-300">
-          We do not collect more information than necessary to provide our
-          services or improve your experience.
-        </p>
-      </section>
-
-      <section className="mb-6">
-        <h2 className="font-semibold text-lg mb-2">
-          3. How we use your information
-        </h2>
-        <ul className="list-disc list-inside text-gray-300 mb-2">
-          <li>To process and fulfill orders</li>
-          <li>
+          <li className="flex items-start gap-2">
+            <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
             To communicate about your account, orders, or support requests
           </li>
-          <li>
+          <li className="flex items-start gap-2">
+            <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
             To send marketing and promotional communications if you have opted
             in
           </li>
-          <li>To improve our website, products, and services</li>
-          <li>To detect and prevent fraud or unauthorized activity</li>
+          <li className="flex items-start gap-2">
+            <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+            To improve our website, products, and services
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+            To detect and prevent fraud or unauthorized activity
+          </li>
         </ul>
-      </section>
-
-      <section className="mb-6">
-        <h2 className="font-semibold text-lg mb-2">
-          4. Sharing your information
-        </h2>
-        <p className="text-gray-300 mb-1">
-          We may share your information with:
-        </p>
-        <ul className="list-disc list-inside text-gray-300 mb-2">
-          <li>Payment processors to complete transactions</li>
-          <li>Delivery services to fulfill orders</li>
-          <li>Marketing and analytics providers to improve our services</li>
-          <li>Law enforcement or regulators if required by law</li>
-        </ul>
-        <p className="text-gray-300">
-          We do not sell your personal information to third parties.
-        </p>
-      </section>
-
-      <section className="mb-6">
-        <h2 className="font-semibold text-lg mb-2">5. Cookies and tracking</h2>
-        <p className="text-gray-300 mb-1">
+      ),
+    },
+    {
+      icon: Share2,
+      title: "Sharing your information",
+      content: (
+        <>
+          <p className="mb-3">We may share your information with:</p>
+          <ul className="space-y-2 mb-3">
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Payment processors to complete transactions
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Delivery services to fulfill orders
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Marketing and analytics providers to improve our services
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Law enforcement or regulators if required by law
+            </li>
+          </ul>
+          <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+            <p className="text-green-400 text-sm font-medium">
+              We do not sell your personal information to third parties.
+            </p>
+          </div>
+        </>
+      ),
+    },
+    {
+      icon: Cookie,
+      title: "Cookies and tracking",
+      content: (
+        <p>
           Our website uses cookies and pixels to improve user experience, track
           website performance, and show relevant advertisements. You can manage
           cookies in your browser settings.
         </p>
-      </section>
-
-      <section className="mb-6">
-        <h2 className="font-semibold text-lg mb-2">6. Your rights</h2>
-        <p className="text-gray-300 mb-1">
-          Depending on your jurisdiction, you may have rights to:
-        </p>
-        <ul className="list-disc list-inside text-gray-300 mb-2">
-          <li>Access your personal data</li>
-          <li>Correct inaccurate or incomplete information</li>
-          <li>Request deletion of your data</li>
-          <li>Withdraw consent for marketing communications</li>
-          <li>Object to processing of your data in certain situations</li>
-        </ul>
-        <p className="text-gray-300">
-          To exercise these rights, please contact us at{" "}
-          <a
-            href="mailto:support@bluejag.com"
-            className="text-blue-600 underline"
-          >
-            support@bluejag.com
-          </a>
-          .
-        </p>
-      </section>
-
-      <section className="mb-6">
-        <h2 className="font-semibold text-lg mb-2">7. Data security</h2>
-        <p className="text-gray-300">
+      ),
+    },
+    {
+      icon: UserCheck,
+      title: "Your rights",
+      content: (
+        <>
+          <p className="mb-3">
+            Depending on your jurisdiction, you may have rights to:
+          </p>
+          <ul className="space-y-2 mb-3">
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Access your personal data
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Correct inaccurate or incomplete information
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Request deletion of your data
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Withdraw consent for marketing communications
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="w-1.5 h-1.5 mt-2 bg-blue-500 rounded-full flex-shrink-0" />
+              Object to processing of your data in certain situations
+            </li>
+          </ul>
+          <p>
+            To exercise these rights, contact us at{" "}
+            <a
+              href="mailto:bluejagltd@gmail.com"
+              className="text-blue-400 hover:underline"
+            >
+              bluejagltd@gmail.com
+            </a>
+            .
+          </p>
+        </>
+      ),
+    },
+    {
+      icon: Lock,
+      title: "Data security",
+      content: (
+        <p>
           We implement appropriate technical and organizational measures to
           protect your personal information from unauthorized access,
           alteration, disclosure, or destruction.
         </p>
-      </section>
-
-      <section className="mb-6">
-        <h2 className="font-semibold text-lg mb-2">
-          8. Changes to this privacy notice
-        </h2>
-        <p className="text-gray-300">
+      ),
+    },
+    {
+      icon: RefreshCw,
+      title: "Changes to this privacy notice",
+      content: (
+        <p>
           We may update this notice from time to time. The most recent version
           will always be available on our website.
         </p>
-      </section>
+      ),
+    },
+  ];
 
-      <section className="mb-6">
-        <h2 className="font-semibold text-lg mb-2">9. Contact</h2>
-        <p className="text-gray-300">
-          If you have questions or concerns about this Privacy Notice, contact
-          us at{" "}
-          <a
-            href="mailto:support@bluejag.com"
-            className="text-blue-600 underline"
+  return (
+    <div className="min-h-screen bg-[#0a0f1a] text-white">
+      {/* Hero */}
+      <div className="relative py-16 md:py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-600/10 via-transparent to-transparent" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-blue-500/10 rounded-full blur-3xl" />
+
+        <div className="relative max-w-4xl mx-auto px-4 md:px-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+            <Shield size={28} className="text-blue-400" />
+          </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
+            Privacy Notice
+          </h1>
+          <p className="mt-4 text-slate-400 max-w-xl mx-auto">
+            Your privacy matters to us. Here's how we collect, use, and protect
+            your personal information.
+          </p>
+          <p className="mt-4 text-sm text-slate-500">
+            Last updated: November 8, 2025
+          </p>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 md:px-8 pb-16">
+        {/* Key Points Card */}
+        <div className="mb-10 p-6 bg-slate-800/30 border border-slate-700/50 rounded-2xl">
+          <h2 className="font-semibold mb-4">Key Points</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                <Shield size={16} className="text-green-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Data Protection</p>
+                <p className="text-xs text-slate-400">
+                  Your data is encrypted and secured
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                <UserCheck size={16} className="text-blue-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Your Control</p>
+                <p className="text-xs text-slate-400">
+                  Access, correct, or delete your data
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
+                <Share2 size={16} className="text-purple-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">No Selling</p>
+                <p className="text-xs text-slate-400">
+                  We never sell your personal data
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                <Cookie size={16} className="text-amber-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Cookie Control</p>
+                <p className="text-xs text-slate-400">
+                  Manage your cookie preferences
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Accordion Sections */}
+        <div className="space-y-3">
+          {sections.map((section, index) => {
+            const isOpen = openSection === index;
+            const Icon = section.icon;
+            return (
+              <div
+                key={index}
+                className="border border-slate-800 rounded-xl overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenSection(isOpen ? null : index)}
+                  className="w-full flex items-center gap-3 p-4 md:p-5 hover:bg-slate-800/30 transition-colors text-left"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0">
+                    <Icon size={16} className="text-blue-400" />
+                  </div>
+                  <span className="font-medium flex-1">
+                    {index + 1}. {section.title}
+                  </span>
+                  {isOpen ? (
+                    <ChevronUp
+                      size={20}
+                      className="text-slate-400 flex-shrink-0"
+                    />
+                  ) : (
+                    <ChevronDown
+                      size={20}
+                      className="text-slate-400 flex-shrink-0"
+                    />
+                  )}
+                </button>
+                {isOpen && (
+                  <div className="px-4 md:px-5 pb-4 md:pb-5 text-sm text-slate-400 leading-relaxed">
+                    {section.content}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Contact Card */}
+        <div className="mt-12 p-6 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-500/20 rounded-2xl">
+          <h2 className="font-semibold mb-2">Questions about your privacy?</h2>
+          <p className="text-sm text-slate-400 mb-6">
+            If you have any questions or concerns about how we handle your data,
+            we're here to help.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <a
+              href="mailto:bluejagltd@gmail.com"
+              className="flex items-center gap-2 px-4 py-2.5 bg-slate-800/50 rounded-xl text-sm hover:bg-slate-800 transition-colors"
+            >
+              <Mail size={16} className="text-blue-400" />
+              bluejagltd@gmail.com
+            </a>
+            <a
+              href="tel:+2349151658995"
+              className="flex items-center gap-2 px-4 py-2.5 bg-slate-800/50 rounded-xl text-sm hover:bg-slate-800 transition-colors"
+            >
+              <Phone size={16} className="text-blue-400" />
+              09151658995
+            </a>
+          </div>
+        </div>
+
+        {/* Related Links */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            to="/terms"
+            className="text-sm text-slate-400 hover:text-white transition-colors"
           >
-            support@bluejag.com
-          </a>
-          .
-        </p>
-      </section>
+            View Terms & Conditions →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

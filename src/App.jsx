@@ -26,6 +26,7 @@ import Loyalty from "./containers/Loyalty";
 import FourZeroFour from "./containers/FourZeroFour";
 import { useCart } from "./context/CartContext";
 import PointsHistory from "./containers/PointsHistory";
+import AllProductsPage from "./containers/AllProducts";
 
 function App() {
   const { isCartOpen, toggleCart, setLoggedIn, loggedIn, toggleSideBar } =
@@ -85,6 +86,7 @@ function App() {
           <Route path="/category/:cat" element={<CategoryPage />} />
           <Route path="/order/:oid" element={<OrderDetails />} />
           <Route path="/product/:pid" element={<ProductPage />} />
+          <Route path="/product/all" element={<AllProductsPage />} />
           <Route path="/points-history" element={<PointsHistory />} />
 
           {/* Redirect logged-in users away from auth pages */}
