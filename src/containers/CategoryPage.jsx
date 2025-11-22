@@ -55,7 +55,7 @@ const categoryInfo = {
 // === Skeleton Styles ===
 const shimmer = keyframes`
   0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
+  100% { background-position: 200px 0; }
 `;
 
 const SkeletonBase = styled.div`
@@ -68,19 +68,38 @@ const SkeletonBase = styled.div`
   );
   background-size: 600px 100%;
   animation: ${shimmer} 1.4s infinite linear;
-  border-radius: ${(p) => p.$radius || "6px"};
+`;
+
+const SkeletonImage = styled(SkeletonBase)`
+  width: 100%;
+  height: 250px;
+  border-radius: 12px;
+
+  @media (min-width: 768px) {
+    height: 300px;
+  }
+`;
+
+const SkeletonText = styled(SkeletonBase)`
+  height: ${(p) => p.$height || "14px"};
+  width: ${(p) => p.$width || "100%"};
+  border-radius: 6px;
 `;
 
 const CardSkeleton = () => (
   <div className="w-full">
-    {/* Image skeleton */}
-    <SkeletonBase className="w-full h-[300px] rounded-xl" />
-
-    {/* Text skeletons */}
-    <div className="mt-3 flex flex-col gap-2">
-      <SkeletonBase className="h-[14px] w-[85%]" />
-      <SkeletonBase className="h-[12px] w-1/2" />
-      <SkeletonBase className="h-[14px] w-[35%]" />
+    <SkeletonImage />
+    <div
+      style={{
+        marginTop: 12,
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+      }}
+    >
+      <SkeletonText $width="85%" $height="14px" />
+      <SkeletonText $width="50%" $height="12px" />
+      <SkeletonText $width="35%" $height="14px" />
     </div>
   </div>
 );
@@ -127,8 +146,8 @@ const CategoryPage = () => {
       } catch (err) {
         console.error("Error fetching products:", err);
       } finally {
-        // setInitialLoading(false);
-        // setLoadingMore(false);
+        setInitialLoading(false);
+        setLoadingMore(false);
       }
     },
     [normalizedCat, isGender, hasMore, loadingMore]

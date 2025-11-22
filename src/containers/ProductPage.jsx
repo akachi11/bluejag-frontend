@@ -18,7 +18,7 @@ const baseURL = location.origin.includes("localhost") ? localHost : renderAPI;
 // === Skeleton Styles ===
 const shimmer = keyframes`
   0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
+  100% { background-position: 200px 0; }
 `;
 
 const SkeletonBase = styled.div`
@@ -261,7 +261,7 @@ const ProductPage = () => {
           <div className="space-y-4">
             {/* Main Image */}
             <div
-              className="relative aspect-[3/4] bg-slate-900 rounded-2xl overflow-hidden cursor-zoom-in group"
+              className="relative aspect-[3/4] bg-slate-900 rounded-2xl cursor-zoom-in group"
               onClick={() => {
                 setPreviewIndex(activeImageIndex);
                 setPreviewOpen(true);
