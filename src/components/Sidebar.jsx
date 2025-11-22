@@ -96,7 +96,7 @@ const Sidebar = () => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed left-0 top-0 z-50 h-screen w-full md:w-[380px] lg:hidden bg-[#0a0f1a] text-white flex flex-col"
+            className="fixed pb-16 left-0 top-0 z-50 h-screen w-full md:w-[380px] lg:hidden bg-[#0a0f1a] text-white flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -219,7 +219,7 @@ const Sidebar = () => {
             </div>
 
             {/* Footer Actions */}
-            <div className="border-t border-slate-800 p-4 pb-16 bg-[#070a10]">
+            <div className="border-t border-slate-800 p-4 bg-[#070a10]">
               <div className="grid grid-cols-2 gap-3">
                 {!loggedIn ? (
                   <button
