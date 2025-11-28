@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import { X, Star, Upload, Image as ImageIcon } from "lucide-react";
+import { X, Star, Upload } from "lucide-react";
 import axios from "axios";
 import { localHost, renderAPI } from "../constants";
 import { toast } from "react-toastify";
+import { TTSSlider } from "./TTSSlider";
 
 const WriteReviewModal = ({ productId, orderId, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     rating: 0,
     title: "",
     comment: "",
+    ttsRating: 0, // Default to "True to Size"
+    sizePurchased: "",
     image: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
@@ -19,13 +22,11 @@ const WriteReviewModal = ({ productId, orderId, onClose, onSuccess }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image must be less than 5MB");
       return;
     }
 
-    // Convert to base64
     const reader = new FileReader();
     reader.onloadend = () => {
       setFormData((prev) => ({ ...prev, image: reader.result }));
@@ -60,6 +61,8 @@ const WriteReviewModal = ({ productId, orderId, onClose, onSuccess }) => {
           rating: formData.rating,
           title: formData.title,
           comment: formData.comment,
+          ttsRating: formData.ttsRating,
+          sizePurchased: formData.sizePurchased,
           image: formData.image,
         },
         {
@@ -100,7 +103,7 @@ const WriteReviewModal = ({ productId, orderId, onClose, onSuccess }) => {
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center">
+        <div className="sticky top-0 bg-gray-900 border-b border-gray-800 p-6 flex justify-between items-center z-10">
           <h2 className="text-2xl font-bold text-white">Write a Review</h2>
           <button
             onClick={onClose}
@@ -126,6 +129,41 @@ const WriteReviewModal = ({ productId, orderId, onClose, onSuccess }) => {
                 {formData.rating === 5 && "Excellent"}
               </p>
             )}
+          </div>
+
+          {/* Size Purchased */}
+          <div>
+            <label className="block text-white font-semibold mb-2">
+              What size did you purchase? (Optional)
+            </label>
+            <input
+              type="text"
+              value={formData.sizePurchased}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  sizePurchased: e.target.value,
+                }))
+              }
+              placeholder="e.g., M, L, XL"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+            />
+          </div>
+
+          {/* TTS Slider */}
+          <div>
+            <label className="block text-white font-semibold mb-3">
+              How does it fit? <span className="text-red-500">*</span>
+            </label>
+            <p className="text-sm text-gray-400 mb-4">
+              Help other shoppers by sharing how this item fits
+            </p>
+            <TTSSlider
+              value={formData.ttsRating}
+              onChange={(val) =>
+                setFormData((prev) => ({ ...prev, ttsRating: val }))
+              }
+            />
           </div>
 
           {/* Title */}
@@ -171,7 +209,7 @@ const WriteReviewModal = ({ productId, orderId, onClose, onSuccess }) => {
               Add Photo (Optional)
             </label>
             <p className="text-sm text-gray-400 mb-3">
-              Earn extra 25 XP by adding a photo!
+              Earn extra XP by adding a photo!
             </p>
 
             {imagePreview ? (

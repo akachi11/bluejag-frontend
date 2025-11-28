@@ -27,6 +27,7 @@ import FourZeroFour from "./containers/FourZeroFour";
 import { useCart } from "./context/CartContext";
 import PointsHistory from "./containers/PointsHistory";
 import AllProductsPage from "./containers/AllProducts";
+import HelpPage from "./containers/Help";
 
 function App() {
   const { isCartOpen, toggleCart, setLoggedIn, loggedIn, toggleSideBar } =
@@ -88,6 +89,7 @@ function App() {
           <Route path="/product/:pid" element={<ProductPage />} />
           <Route path="/product/all" element={<AllProductsPage />} />
           <Route path="/points-history" element={<PointsHistory />} />
+          <Route path="/help" element={<HelpPage />} />
 
           {/* Redirect logged-in users away from auth pages */}
           <Route

@@ -5,14 +5,18 @@ import { Star, ThumbsUp, ThumbsDown, ChevronDown } from "lucide-react";
 import { toast } from "react-toastify";
 import { useHomeContext } from "../context/HomeContext";
 import WriteReviewModal from "./WriteReviewModal";
+import { TTSDisplay } from "./TTSSlider";
 
 const ReviewsSection = ({ productId }) => {
   const { loggedIn } = useHomeContext();
   const [reviews, setReviews] = useState([]);
   const [stats, setStats] = useState({
     avgRating: 0,
+    avgTTS: 0,
+    ttsLabel: "True to Size",
     totalReviews: 0,
     ratingBreakdown: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+    ttsBreakdown: {},
   });
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -98,7 +102,6 @@ const ReviewsSection = ({ productId }) => {
         }
       );
 
-      // Update local state
       setReviews((prevReviews) =>
         prevReviews.map((review) =>
           review._id === reviewId
@@ -170,7 +173,7 @@ const ReviewsSection = ({ productId }) => {
         <h2 className="text-3xl font-bold mb-8">Customer Reviews</h2>
 
         {/* Rating Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
           {/* Overall Rating */}
           <div className="bg-gray-900 rounded-lg p-6 text-center">
             <div className="text-5xl font-bold mb-2">{stats.avgRating}</div>
@@ -184,11 +187,20 @@ const ReviewsSection = ({ productId }) => {
           </div>
 
           {/* Rating Breakdown */}
-          <div className="md:col-span-2 bg-gray-900 rounded-lg p-6">
+          <div className="bg-gray-900 rounded-lg p-6">
             <div className="space-y-3">
               {[5, 4, 3, 2, 1].map((star) => renderRatingBar(star))}
             </div>
           </div>
+
+          {/* TTS Display */}
+          {stats.totalReviews > 0 && (
+            <TTSDisplay
+              avgTTS={stats.avgTTS}
+              totalVotes={stats.totalReviews}
+              ttsBreakdown={stats.ttsBreakdown}
+            />
+          )}
         </div>
 
         {/* Write Review Button */}
@@ -296,6 +308,22 @@ const ReviewCard = ({ review, onVote, loggedIn }) => {
     );
   };
 
+  const getTTSLabel = (val) => {
+    if (val <= -3) return "Runs Very Small";
+    if (val === -2 || val === -1) return "Runs Small";
+    if (val === 0) return "True to Size";
+    if (val === 1 || val === 2) return "Runs Large";
+    if (val >= 3) return "Runs Very Large";
+    return "True to Size";
+  };
+
+  const getTTSColor = (val) => {
+    if (val <= -2) return "text-red-400";
+    if (val >= -1 && val <= 1) return "text-green-400";
+    if (val >= 2) return "text-blue-400";
+    return "text-white";
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "long",
@@ -318,6 +346,11 @@ const ReviewCard = ({ review, onVote, loggedIn }) => {
                 Verified Purchase
               </span>
             )}
+            {review.sizePurchased && (
+              <span className="bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded">
+                Size: {review.sizePurchased}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
             {renderStars(review.rating)}
@@ -327,6 +360,19 @@ const ReviewCard = ({ review, onVote, loggedIn }) => {
           </div>
         </div>
       </div>
+
+      {/* TTS Badge */}
+      {review.ttsRating !== undefined && (
+        <div className="mb-4">
+          <span
+            className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${getTTSColor(
+              review.ttsRating
+            )} bg-gray-800`}
+          >
+            Fit: {getTTSLabel(review.ttsRating)}
+          </span>
+        </div>
+      )}
 
       {/* Title */}
       {review.title && (
