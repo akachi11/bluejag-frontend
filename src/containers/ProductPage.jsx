@@ -12,6 +12,8 @@ import { useHomeContext } from "../context/HomeContext";
 import { toast } from "react-toastify";
 import GoinBlue from "../components/GoinBlue";
 import ReviewsSection from "../components/ReviewSection";
+import { Ruler } from "lucide-react";
+import SizeGuideModal from "../components/SizeGuideModal";
 
 const baseURL = location.origin.includes("localhost") ? localHost : renderAPI;
 
@@ -51,6 +53,7 @@ const ProductPage = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientX);
   const handleTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
@@ -404,6 +407,13 @@ const ProductPage = () => {
                     {selection.size || "Select"}
                   </span>
                 </span>
+                <button
+                  onClick={() => setShowSizeGuide(true)}
+                  className="text-sm text-blue-400 font-medium hover:text-blue-300 transition flex items-center gap-1"
+                >
+                  <Ruler size={14} />
+                  Size Guide
+                </button>
                 {product.modelSize && (
                   <span className="text-sm text-slate-500">
                     Model wears {product.modelSize}
@@ -640,6 +650,13 @@ const ProductPage = () => {
 
       {/* Reviews Section */}
       {product && <ReviewsSection productId={product._id} />}
+
+      {showSizeGuide && (
+        <SizeGuideModal
+          productId={product._id}
+          onClose={() => setShowSizeGuide(false)}
+        />
+      )}
 
       {/* Related Products */}
       <GoinBlue />

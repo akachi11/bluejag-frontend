@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { localHost, renderAPI } from "../constants";
-import { Star, ThumbsUp, ThumbsDown, ChevronDown } from "lucide-react";
+import {
+  Star,
+  ThumbsUp,
+  ThumbsDown,
+  ChevronDown,
+  Eye,
+  Edit2,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import { useHomeContext } from "../context/HomeContext";
 import WriteReviewModal from "./WriteReviewModal";
+import AllReviewsModal from "./AllReviewsModal";
 import { TTSDisplay } from "./TTSSlider";
 
 const ReviewsSection = ({ productId }) => {
   const { loggedIn } = useHomeContext();
   const [reviews, setReviews] = useState([]);
+  const [userReview, setUserReview] = useState(null);
   const [stats, setStats] = useState({
     avgRating: 0,
     avgTTS: 0,
@@ -19,21 +28,23 @@ const ReviewsSection = ({ productId }) => {
     ttsBreakdown: {},
   });
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [sort, setSort] = useState("recent");
   const [canReview, setCanReview] = useState(false);
   const [orderId, setOrderId] = useState(null);
   const [showWriteReview, setShowWriteReview] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+
+  const PREVIEW_LIMIT = 3; // Show 3 reviews on main page
 
   useEffect(() => {
-    fetchReviews(1, true);
+    fetchReviews();
     if (loggedIn) {
       checkCanReview();
+      fetchUserReview();
     }
-  }, [productId, sort, loggedIn]);
+  }, [productId, loggedIn]);
 
-  const fetchReviews = async (pageNum = 1, reset = false) => {
+  const fetchReviews = async () => {
     try {
       setLoading(true);
       const token = loggedIn
@@ -45,24 +56,40 @@ const ReviewsSection = ({ productId }) => {
           location.origin.includes("localhost") ? localHost : renderAPI
         }/api/reviews/product/${productId}`,
         {
-          params: { page: pageNum, limit: 10, sort },
+          params: { page: 1, limit: PREVIEW_LIMIT, sort: "recent" },
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
       );
 
-      if (reset) {
-        setReviews(res.data.reviews);
-      } else {
-        setReviews((prev) => [...prev, ...res.data.reviews]);
-      }
-
+      setReviews(res.data.reviews);
       setStats(res.data.stats);
-      setHasMore(res.data.pagination.page < res.data.pagination.pages);
-      setPage(pageNum);
     } catch (err) {
       console.error("Failed to fetch reviews:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserReview = async () => {
+    try {
+      const token = JSON.parse(localStorage.getItem("bj_userData"))?.token;
+      const userId = JSON.parse(localStorage.getItem("bj_userData"))?.id;
+
+      const res = await axios.get(
+        `${
+          location.origin.includes("localhost") ? localHost : renderAPI
+        }/api/reviews/product/${productId}`,
+        {
+          params: { page: 1, limit: 100 }, // Get enough to find user's review
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Find user's review
+      const myReview = res.data.reviews.find((r) => r.userId._id === userId);
+      setUserReview(myReview || null);
+    } catch (err) {
+      console.error("Failed to fetch user review:", err);
     }
   };
 
@@ -102,6 +129,7 @@ const ReviewsSection = ({ productId }) => {
         }
       );
 
+      // Update reviews list
       setReviews((prevReviews) =>
         prevReviews.map((review) =>
           review._id === reviewId
@@ -114,6 +142,16 @@ const ReviewsSection = ({ productId }) => {
             : review
         )
       );
+
+      // Update user review if it's theirs
+      if (userReview?._id === reviewId) {
+        setUserReview((prev) => ({
+          ...prev,
+          upvotes: res.data.upvotes,
+          downvotes: res.data.downvotes,
+          userVote: res.data.userVote,
+        }));
+      }
     } catch (err) {
       toast.error("Failed to vote");
     }
@@ -121,9 +159,38 @@ const ReviewsSection = ({ productId }) => {
 
   const handleReviewSubmitted = () => {
     setShowWriteReview(false);
-    fetchReviews(1, true);
+    setEditingReview(null);
+    fetchReviews();
+    fetchUserReview();
     checkCanReview();
     toast.success("Review submitted! It will be visible after admin approval.");
+  };
+
+  const handleEditClick = () => {
+    setEditingReview(userReview);
+    setShowWriteReview(true);
+  };
+
+  const handleDeleteReview = async () => {
+    if (!window.confirm("Are you sure you want to delete this review?")) return;
+
+    try {
+      const token = JSON.parse(localStorage.getItem("bj_userData"))?.token;
+      await axios.delete(
+        `${
+          location.origin.includes("localhost") ? localHost : renderAPI
+        }/api/reviews/${userReview._id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success("Review deleted");
+      setUserReview(null);
+      fetchReviews();
+      checkCanReview();
+    } catch (err) {
+      toast.error("Failed to delete review");
+    }
   };
 
   const renderStars = (rating) => {
@@ -203,8 +270,38 @@ const ReviewsSection = ({ productId }) => {
           )}
         </div>
 
+        {/* User's Review (if exists) - Show First */}
+        {loggedIn && userReview && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold">Your Review</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleEditClick}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition"
+                >
+                  <Edit2 size={16} />
+                  Edit
+                </button>
+                <button
+                  onClick={handleDeleteReview}
+                  className="px-4 py-2 bg-red-900 hover:bg-red-800 rounded-lg text-sm font-medium transition"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <ReviewCard
+              review={userReview}
+              onVote={handleVote}
+              loggedIn={loggedIn}
+              isUserReview={true}
+            />
+          </div>
+        )}
+
         {/* Write Review Button */}
-        {loggedIn && canReview && (
+        {loggedIn && canReview && !userReview && (
           <button
             onClick={() => setShowWriteReview(true)}
             className="mb-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
@@ -213,31 +310,13 @@ const ReviewsSection = ({ productId }) => {
           </button>
         )}
 
-        {/* Sort Options */}
-        <div className="flex items-center gap-4 mb-6">
-          <span className="text-sm text-gray-400">Sort by:</span>
-          <select
-            value={sort}
-            onChange={(e) => {
-              setSort(e.target.value);
-              fetchReviews(1, true);
-            }}
-            className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-          >
-            <option value="recent">Most Recent</option>
-            <option value="helpful">Most Helpful</option>
-            <option value="rating_high">Highest Rating</option>
-            <option value="rating_low">Lowest Rating</option>
-          </select>
-        </div>
-
-        {/* Reviews List */}
+        {/* Other Reviews */}
         <div className="space-y-6">
-          {loading && page === 1 ? (
+          {loading ? (
             <div className="text-center py-12">
               <p className="text-gray-400">Loading reviews...</p>
             </div>
-          ) : reviews.length === 0 ? (
+          ) : reviews.length === 0 && !userReview ? (
             <div className="text-center py-12 bg-gray-900 rounded-lg">
               <p className="text-gray-400 mb-4">No reviews yet</p>
               {loggedIn && canReview && (
@@ -250,38 +329,57 @@ const ReviewsSection = ({ productId }) => {
               )}
             </div>
           ) : (
-            reviews.map((review) => (
-              <ReviewCard
-                key={review._id}
-                review={review}
-                onVote={handleVote}
-                loggedIn={loggedIn}
-              />
-            ))
+            <>
+              {reviews
+                .filter((r) => r._id !== userReview?._id) // Don't show user's review twice
+                .map((review) => (
+                  <ReviewCard
+                    key={review._id}
+                    review={review}
+                    onVote={handleVote}
+                    loggedIn={loggedIn}
+                  />
+                ))}
+            </>
           )}
         </div>
 
-        {/* Load More */}
-        {hasMore && !loading && reviews.length > 0 && (
+        {/* View All Button */}
+        {stats.totalReviews > PREVIEW_LIMIT && (
           <div className="text-center mt-8">
             <button
-              onClick={() => fetchReviews(page + 1, false)}
+              onClick={() => setShowAllReviews(true)}
               className="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-semibold transition inline-flex items-center gap-2"
             >
-              Load More Reviews
-              <ChevronDown size={20} />
+              <Eye size={20} />
+              View All {stats.totalReviews} Reviews
             </button>
           </div>
         )}
       </div>
 
-      {/* Write Review Modal */}
+      {/* Write/Edit Review Modal */}
       {showWriteReview && (
         <WriteReviewModal
           productId={productId}
           orderId={orderId}
-          onClose={() => setShowWriteReview(false)}
+          existingReview={editingReview}
+          onClose={() => {
+            setShowWriteReview(false);
+            setEditingReview(null);
+          }}
           onSuccess={handleReviewSubmitted}
+        />
+      )}
+
+      {/* All Reviews Modal */}
+      {showAllReviews && (
+        <AllReviewsModal
+          productId={productId}
+          userReview={userReview}
+          onClose={() => setShowAllReviews(false)}
+          onVote={handleVote}
+          loggedIn={loggedIn}
         />
       )}
     </div>
@@ -289,7 +387,7 @@ const ReviewsSection = ({ productId }) => {
 };
 
 // Review Card Component
-const ReviewCard = ({ review, onVote, loggedIn }) => {
+const ReviewCard = ({ review, onVote, loggedIn, isUserReview = false }) => {
   const renderStars = (rating) => {
     return (
       <div className="flex gap-1">
@@ -333,7 +431,11 @@ const ReviewCard = ({ review, onVote, loggedIn }) => {
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg p-6">
+    <div
+      className={`bg-gray-900 rounded-lg p-6 ${
+        isUserReview ? "border-2 border-blue-500" : ""
+      }`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
@@ -341,9 +443,19 @@ const ReviewCard = ({ review, onVote, loggedIn }) => {
             <span className="font-semibold">
               {review.userId.firstName} {review.userId.lastName}
             </span>
+            {isUserReview && (
+              <span className="bg-blue-900 text-blue-300 text-xs px-2 py-1 rounded">
+                You
+              </span>
+            )}
             {review.isVerifiedPurchase && (
-              <span className="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">
+              <span className="bg-green-900 text-green-300 text-[10px] whitespace-nowrap overflow-hidden text-ellipsis px-2 py-1 rounded">
                 Verified Purchase
+              </span>
+            )}
+            {!review.isApproved && (
+              <span className="bg-yellow-900 text-yellow-300 text-xs px-2 py-1 rounded">
+                Pending Approval
               </span>
             )}
             {review.sizePurchased && (

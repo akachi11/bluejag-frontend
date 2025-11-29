@@ -60,7 +60,7 @@ const SignIn = () => {
       const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
       localStorage.setItem(
         "bj_userData",
-        JSON.stringify({ token, name, email, expiry })
+        JSON.stringify({ token, name, email, expiry, id: res.data._id })
       );
       setLoggedIn(true);
       navigate("/");
