@@ -88,6 +88,7 @@ const Cart = () => {
     favorites,
     removeFavorites,
     clearFavorites,
+    setFavorites,
   } = useCart();
   const { loggedIn } = useHomeContext();
   const navigate = useNavigate();
@@ -96,7 +97,6 @@ const Cart = () => {
   const token = userData?.token;
   const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
 
-  // Validation
   useEffect(() => {
     const errs = {};
     if (!formData.firstName) errs.firstName = "Required";
@@ -128,6 +128,33 @@ const Cart = () => {
     if (loggedIn && showOrderModal && addresses.length < 1) getAddresses();
   }, [showOrderModal]);
 
+  useEffect(() => {
+    if (favorites.length < 1 && activeTab === "wishlist") {
+      fetchFavorites();
+    }
+  }, [activeTab]);
+
+  const fetchFavorites = async (itemId) => {
+    setLoadingCart(true);
+    const res = await axios.get(
+      `${
+        location.origin.includes("localhost") ? localHost : renderAPI
+      }/api/favorite/`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
+    const cleanedFavorites = res.data.map((item) => ({
+      productId: item.productId,
+      name: item.name,
+      price: item.price,
+      thumbnail: item.thumbnail,
+    }));
+    setFavorites(cleanedFavorites);
+    setLoadingCart(false);
+  };
+
   const getUserCart = async () => {
     try {
       const res = await axios.get(`${baseURL}/api/cart/`, {
@@ -157,7 +184,9 @@ const Cart = () => {
     try {
       const res = await axios.get(
         `${baseURL}/api/discount/validate/${discountCode}`,
-        loggedIn ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+        loggedIn
+          ? { headers: { Authorization: `Bearer ${token}` } }
+          : undefined,
       );
       setCodeVerified(true);
       setDiscountTotal(applyDiscount(res.data.discount));
@@ -175,7 +204,9 @@ const Cart = () => {
       const res = await axios.post(
         `${baseURL}/api/order/summary`,
         { cartItems: cart, shippingAddress: selectedAddress, discountCode },
-        loggedIn ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+        loggedIn
+          ? { headers: { Authorization: `Bearer ${token}` } }
+          : undefined,
       );
       setOrderData(res.data.summary);
       setShowOrderModal(true);
@@ -205,7 +236,9 @@ const Cart = () => {
               },
           discountCode,
         },
-        loggedIn ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+        loggedIn
+          ? { headers: { Authorization: `Bearer ${token}` } }
+          : undefined,
       );
       setOrderData(res.data.order);
       clearCart();
@@ -387,7 +420,7 @@ const Cart = () => {
                                 item.color,
                                 item.size,
                                 false,
-                                true
+                                true,
                               )
                             }
                             disabled={item.qty === 1}
@@ -409,7 +442,7 @@ const Cart = () => {
                                 item.color,
                                 item.size,
                                 true,
-                                false
+                                false,
                               )
                             }
                             className="p-2 rounded-r-lg hover:bg-slate-700 transition-colors"
@@ -474,7 +507,7 @@ const Cart = () => {
                   <span className="text-xl font-bold">
                     {(codeVerified ? discountTotal : total).toLocaleString(
                       "en-NG",
-                      { style: "currency", currency: "NGN" }
+                      { style: "currency", currency: "NGN" },
                     )}
                   </span>
                 </div>
@@ -524,6 +557,8 @@ const Cart = () => {
               buttonText="Sign In"
               onClick={() => navigate("/signin")}
             />
+          ) : loadingCart ? (
+            <CartSkeleton />
           ) : favorites.length < 1 ? (
             <EmptyState
               icon={Heart}
@@ -626,12 +661,12 @@ const Cart = () => {
                       ? clearCart()
                       : clearFavorites()
                     : activeTab === "cart"
-                    ? removeProduct(
-                        activeProduct.productId,
-                        activeProduct.color,
-                        activeProduct.size
-                      )
-                    : removeFavorites(activeProduct._id);
+                      ? removeProduct(
+                          activeProduct.productId,
+                          activeProduct.color,
+                          activeProduct.size,
+                        )
+                      : removeFavorites(activeProduct._id);
                 }}
                 className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 rounded-xl font-medium transition-colors"
               >

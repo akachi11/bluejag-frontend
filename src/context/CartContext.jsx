@@ -29,28 +29,74 @@ export const CartProvider = ({ children }) => {
     setFavIds(() => favorites.map((fav) => fav.productId));
   }, [favorites]);
 
+  // Two cart entries are "the same line item" only if they match on all
+  // three: productId, size, and color. This matters especially now that
+  // multiple colorways of a style can share the same product name but have
+  // different productIds — matching by name would wrongly merge a black pair
+  // and a burgundy pair into one line.
+  const sameCartIdentity = (a, b) =>
+    String(a.productId) === String(b.productId) &&
+    (a.size || "") === (b.size || "") &&
+    (a.color || "").toLowerCase() === (b.color || "").toLowerCase();
+
   const addProduct = async (product) => {
-    setCart((prev) => [...prev, product]);
+    const qtyToAdd = Number(product.qty) || 1;
 
     if (loggedIn) {
-      const res = await axios.post(
-        `${
-          location.origin.includes("localhost") ? localHost : renderAPI
-        }/api/cart/`,
-        product,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      try {
+        const res = await axios.post(
+          `${
+            location.origin.includes("localhost") ? localHost : renderAPI
+          }/api/cart/`,
+          { ...product, qty: qtyToAdd },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        // The backend already merges a duplicate productId+size+color line
+        // into the existing one (incrementing qty) rather than creating a
+        // second line item. Mirror that response exactly instead of
+        // re-deriving it locally, so the client never drifts out of sync
+        // with the source of truth.
+        if (res.data?.items) {
+          setCart(res.data.items);
         }
-      );
+      } catch (err) {
+        console.error("❌ addProduct error:", err);
+        toast.error("Failed to add to cart");
+      }
+      return;
     }
+
+    // Guests: the cart only ever lives in localStorage, so merge duplicate
+    // lines ourselves the same way the backend does for logged-in users.
+    setCart((prev) => {
+      const existingIdx = prev.findIndex((it) => sameCartIdentity(it, product));
+      if (existingIdx > -1) {
+        const next = [...prev];
+        next[existingIdx] = {
+          ...next[existingIdx],
+          qty: (Number(next[existingIdx].qty) || 1) + qtyToAdd,
+          price: product.price,
+          name: product.name,
+          image: product.image,
+        };
+        return next;
+      }
+      return [...prev, { ...product, qty: qtyToAdd }];
+    });
   };
 
   const removeProduct = async (id, color, size) => {
     setCart((prev) =>
       prev.filter(
         (item) =>
-          !(item.productId === id && item.color === color && item.size === size)
-      )
+          !(
+            item.productId === id &&
+            item.color === color &&
+            item.size === size
+          ),
+      ),
     );
 
     if (loggedIn) {
@@ -65,7 +111,7 @@ export const CartProvider = ({ children }) => {
             size: size,
           },
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
     }
   };
@@ -86,7 +132,7 @@ export const CartProvider = ({ children }) => {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
     }
 
@@ -102,7 +148,7 @@ export const CartProvider = ({ children }) => {
         if (subtract) next = Math.max(1, current - 1);
 
         return { ...item, qty: next };
-      })
+      }),
     );
   };
 
@@ -122,7 +168,7 @@ export const CartProvider = ({ children }) => {
         }/api/cart/`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
     }
   };
@@ -140,32 +186,12 @@ export const CartProvider = ({ children }) => {
         { productId: _id },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
-
       toast.success("Added to favorites");
     } catch (error) {
       toast.error("Something went wrong");
     }
-  };
-
-  const fetchFavorites = async (itemId) => {
-    const res = await axios.get(
-      `${
-        location.origin.includes("localhost") ? localHost : renderAPI
-      }/api/favorite/`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    const cleanedFavorites = res.data.map((item) => ({
-      productId: item.productId,
-      name: item.name,
-      price: item.price,
-      thumbnail: item.thumbnail,
-    }));
-    setFavorites(cleanedFavorites);
   };
 
   const removeFavorites = async (itemId) => {
@@ -178,7 +204,7 @@ export const CartProvider = ({ children }) => {
         {
           data: { productId: itemId },
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       toast.info("Removed favorites");
     } catch (error) {
@@ -193,7 +219,7 @@ export const CartProvider = ({ children }) => {
         `${
           location.origin.includes("localhost") ? localHost : renderAPI
         }/api/favorite/clear`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       toast.info("Wishlist cleared");
     } catch (error) {
@@ -224,9 +250,9 @@ export const CartProvider = ({ children }) => {
     clearCart,
     applyDiscount,
     favoriteItem,
-    fetchFavorites,
     removeFavorites,
     clearFavorites,
+    setFavorites,
     favorites,
     favIds,
   };

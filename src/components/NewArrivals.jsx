@@ -42,7 +42,7 @@ const HomeSlide = ({ title, products, subtitle }) => {
     if (!container) return;
     setCanScrollLeft(container.scrollLeft > 10);
     setCanScrollRight(
-      container.scrollWidth - container.scrollLeft - container.clientWidth > 10
+      container.scrollWidth - container.scrollLeft - container.clientWidth > 10,
     );
   };
 
@@ -261,7 +261,7 @@ const HomeSlide = ({ title, products, subtitle }) => {
                     <h3 className="font-medium text-white text-sm md:text-base truncate group-hover/card:text-blue-400 transition-colors">
                       {item.name}
                     </h3>
-                    <p className="text-slate-500 text-xs md:text-sm truncate">
+                    <p className="capitalize text-slate-500 text-xs md:text-sm truncate">
                       {item.categories?.[0] || item.gender || item.desc}
                     </p>
                     <p className="font-semibold text-white text-sm md:text-base">

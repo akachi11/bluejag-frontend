@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
 import { Instagram } from "lucide-react";
 import photo1 from "../assets/goinblue1.jpg";
-import photo2 from "../assets/goinblue2.jpeg";
-import photo3 from "../assets/goinblue3.jpeg";
-import photo4 from "../assets/goinblue4.jpeg";
-import photo5 from "../assets/goinblue5.jpeg";
+import photo2 from "../assets/goinblue2.jpg";
+import photo3 from "../assets/goinblue3.jpg";
+import photo4 from "../assets/goinblue4.jpg";
+import photo5 from "../assets/goinblue6.PNG";
 import photo6 from "../assets/HomeImg.jpg";
 
 const GoinBlue = () => {
@@ -80,7 +80,7 @@ const GoinBlue = () => {
         {photos.map((photo, index) => (
           <a
             key={index}
-            href="https://instagram.com/bluejag"
+            href="https://instagram.com/bluejagco"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative flex-shrink-0 w-[70vw] sm:w-[45vw] md:w-[30vw] lg:w-[20vw] aspect-square rounded-2xl overflow-hidden"

@@ -28,20 +28,20 @@ const ReferralModal = ({ isOpen, onClose, referralCode, userName }) => {
       case "whatsapp":
         window.open(
           `https://wa.me/?text=${encodeURIComponent(message)}`,
-          "_blank"
+          "_blank",
         );
         break;
       case "twitter":
         window.open(
           `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-            message
+            message,
           )}`,
-          "_blank"
+          "_blank",
         );
         break;
       case "email":
         window.location.href = `mailto:?subject=Join BlueJag with my referral code&body=${encodeURIComponent(
-          message
+          message,
         )}`;
         break;
       case "native":
@@ -95,19 +95,13 @@ const ReferralModal = ({ isOpen, onClose, referralCode, userName }) => {
               <div className="flex items-start gap-2">
                 <span className="text-blue-200">🎁</span>
                 <span>
-                  You get <strong>200 XP</strong> when they sign up
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-blue-200">🎁</span>
-                <span>
-                  Your friend gets <strong>100 XP</strong> when they sign up
+                  You get <strong>50 XP</strong> when they sign up
                 </span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-purple-200">💰</span>
                 <span>
-                  You get <strong>150 XP</strong> when they make their first
+                  You get <strong>100 XP</strong> when they make their first
                   purchase
                 </span>
               </div>

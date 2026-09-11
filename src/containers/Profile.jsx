@@ -67,6 +67,8 @@ const Profile = () => {
   const userData = JSON.parse(localStorage.getItem("bj_userData"));
   const token = userData?.token;
 
+  console.log(userInfo);
+
   const getUserInfo = async () => {
     setLoading(true);
     try {
@@ -90,7 +92,7 @@ const Profile = () => {
   }, [userInfo?.xp]);
   useEffect(() => {
     const mainAddr = userInfo?.addresses?.find(
-      (addr) => addr.isDefault === true
+      (addr) => addr.isDefault === true,
     );
     setMainAddress(mainAddr);
   }, [userInfo]);

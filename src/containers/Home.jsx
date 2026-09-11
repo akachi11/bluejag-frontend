@@ -25,13 +25,14 @@ const Home = () => {
       const response = await axios.get(
         `${
           location.origin.includes("localhost") ? localHost : renderAPI
-        }/api/product/category/new`
+        }/api/product/new-arrivals`,
       );
       setProducts(response.data.products);
+      console.log(response.data.products);
     } catch (error) {
       console.error(
         "❌ Error fetching products:",
-        error.response?.data || error.message
+        error.response?.data || error.message,
       );
       toast.error("Error fetching products");
     }

@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+// COMMENTED OUT DESCRIPTION IMAGE - MAY RE-ADD LATER. WAS CAUSING LAYOUT ISSUES AND DIDN'T SEEM TO ADD MUCH VALUE TO THE PAGE. CAN BE REVISITED IF WE GET HIGH-QUALITY DESCRIPTIVE IMAGES FOR PRODUCTS IN THE FUTURE.
+
+import React, { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import styled, { keyframes } from "styled-components";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
@@ -46,6 +48,10 @@ const ProductPage = () => {
     hexCode: "",
   });
   const [product, setProduct] = useState(null);
+  // Every colorway document for this style (the fetched product itself, plus
+  // every sibling from colorVariants), fetched once up front so switching
+  // colors never needs another network round trip.
+  const [peerProducts, setPeerProducts] = useState([]);
   const [images, setImages] = useState([]);
   const [colors, setColors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,8 +84,16 @@ const ProductPage = () => {
   ];
 
   const { pid } = useParams();
+  const navigate = useNavigate();
   const { addProduct, favoriteItem, favIds, removeFavorites } = useCart();
   const { loggedIn } = useHomeContext();
+
+  // When switching colorways in place, we update the URL with navigate(...,
+  // { replace: true }) purely so the address bar / bookmarks / back button
+  // stay correct. That URL change updates `pid` and would normally re-trigger
+  // the fetch effect below — this ref lets that effect know to skip the
+  // refetch because we already have the sibling's full data in memory.
+  const skipNextFetchRef = useRef(false);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -95,32 +109,74 @@ const ProductPage = () => {
   }, [previewOpen, images.length]);
 
   useEffect(() => {
+    if (skipNextFetchRef.current) {
+      // URL changed because we swapped colorways in place, not because of a
+      // real navigation — the data's already in peerProducts, skip refetch.
+      skipNextFetchRef.current = false;
+      return;
+    }
     getProduct();
     window.scrollTo(0, 0);
   }, [pid]);
+
+  // Builds the swatch list and initial selection/images for whichever
+  // colorway document is currently active (`activeProduct`). Shared by the
+  // initial fetch and by in-place color switching so both paths behave
+  // identically.
+  const activateProduct = (activeProduct, peers) => {
+    setProduct(activeProduct);
+    setPeerProducts(peers);
+
+    // Swatches = every color across every colorway document for this style
+    // (the active one + all its siblings), each tagged with which product
+    // document it belongs to.
+    const swatches = peers.flatMap((peer) =>
+      (peer.colors || []).map((c) => {
+        const matchingVariants = (peer.variants || []).filter(
+          (v) => v.color?.toLowerCase() === c.hexCode.toLowerCase(),
+        );
+        return {
+          ...c,
+          productId: peer._id,
+          // A colorway with confirmed zero stock across every size — shown
+          // but visibly disabled rather than hidden. Only flagged when we
+          // actually have matching variant records, so missing/mistagged
+          // variant data doesn't get misread as "sold out".
+          soldOut:
+            matchingVariants.length > 0 &&
+            matchingVariants.every((v) => v.units <= 0),
+        };
+      }),
+    );
+    setColors(swatches);
+
+    if (activeProduct?.colors?.length > 0 && activeProduct?.images?.length > 0) {
+      const firstColor = activeProduct.colors[0];
+      setSelection({
+        hexCode: firstColor.hexCode,
+        color: firstColor.name,
+        size: "",
+      });
+      const filtered = activeProduct.images.filter(
+        (img) =>
+          img.color?.toLowerCase() === firstColor.hexCode.toLowerCase(),
+      );
+      setImages(filtered.map((img) => img.url));
+      setActiveImageIndex(0);
+    } else {
+      setImages([]);
+    }
+  };
 
   const getProduct = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${baseURL}/api/product/get-product/${pid}`
+        `${baseURL}/api/product/get-product/${pid}`,
       );
       const data = response.data;
-      setProduct(data);
-
-      if (data?.colors?.length > 0 && data?.images?.length > 0) {
-        setColors(data.colors);
-        const firstColor = data.colors[0];
-        setSelection((s) => ({
-          ...s,
-          hexCode: firstColor.hexCode,
-          color: firstColor.name,
-        }));
-        const filtered = data.images.filter(
-          (img) => img.color?.toLowerCase() === firstColor.hexCode.toLowerCase()
-        );
-        setImages(filtered.map((img) => img.url));
-      }
+      const { colorVariants, ...ownProduct } = data;
+      activateProduct(ownProduct, [ownProduct, ...(colorVariants || [])]);
     } catch (error) {
       console.error("Error fetching product:", error);
       toast.error("Failed to load product");
@@ -130,19 +186,47 @@ const ProductPage = () => {
   };
 
   const handleColorSelect = (colorObj) => {
-    setSelection((s) => ({
-      ...s,
+    // Same document — just a different color entry within its own colors[]
+    // array. Switch images in place, nothing else changes.
+    if (!colorObj.productId || colorObj.productId === product._id) {
+      setSelection((s) => ({
+        ...s,
+        hexCode: colorObj.hexCode,
+        color: colorObj.name,
+        size: "",
+      }));
+      const filtered = product.images.filter(
+        (img) => img.color?.toLowerCase() === colorObj.hexCode.toLowerCase(),
+      );
+      if (filtered.length > 0) {
+        setImages(filtered.map((img) => img.url));
+        setActiveImageIndex(0);
+      }
+      return;
+    }
+
+    // Different colorway document (own price/stock/images) — already fully
+    // loaded in peerProducts from the initial fetch, so this is a pure local
+    // state swap. No fetch, no navigation, no page reload.
+    const peer = peerProducts.find((p) => p._id === colorObj.productId);
+    if (!peer) return; // defensive: shouldn't happen since swatches are built from peerProducts
+
+    setProduct(peer);
+    setSelection({
       hexCode: colorObj.hexCode,
       color: colorObj.name,
       size: "",
-    }));
-    const filtered = product.images.filter(
-      (img) => img.color?.toLowerCase() === colorObj.hexCode.toLowerCase()
+    });
+    const filtered = (peer.images || []).filter(
+      (img) => img.color?.toLowerCase() === colorObj.hexCode.toLowerCase(),
     );
-    if (filtered.length > 0) {
-      setImages(filtered.map((img) => img.url));
-      setActiveImageIndex(0);
-    }
+    setImages(filtered.map((img) => img.url));
+    setActiveImageIndex(0);
+
+    // Keep the address bar / bookmarks / back button pointed at the right
+    // colorway without triggering a refetch or page reload.
+    skipNextFetchRef.current = true;
+    navigate(`/product/${peer._id}`, { replace: true });
   };
 
   const handleAddToCart = () => {
@@ -167,6 +251,14 @@ const ProductPage = () => {
 
   const toggleFavorite = (e) => {
     e.stopPropagation();
+    // Show the affordance to everyone; only gate the actual action on being
+    // logged in, so guests see the button and get routed to sign in instead
+    // of the button just silently not existing for them.
+    if (!loggedIn) {
+      toast.info("Sign in to save favorites");
+      navigate("/signin");
+      return;
+    }
     if (isFavorited) {
       removeFavorites(product._id);
     } else {
@@ -285,19 +377,18 @@ const ProductPage = () => {
                 </div>
               )}
 
-              {/* Favorite Button */}
-              {loggedIn && (
-                <button
-                  onClick={toggleFavorite}
-                  className="absolute top-4 right-4 w-10 h-10 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/60 transition-colors"
-                >
-                  {isFavorited ? (
-                    <IoHeart className="text-red-500" size={22} />
-                  ) : (
-                    <IoHeartOutline className="text-white" size={22} />
-                  )}
-                </button>
-              )}
+              {/* Favorite Button — always visible; toggleFavorite itself
+                  handles routing guests to sign in on click */}
+              <button
+                onClick={toggleFavorite}
+                className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-black/60 transition-colors"
+              >
+                {isFavorited ? (
+                  <IoHeart className="text-red-500" size={22} />
+                ) : (
+                  <IoHeartOutline className="text-white" size={22} />
+                )}
+              </button>
 
               {/* Image Counter */}
               <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full text-xs">
@@ -329,7 +420,7 @@ const ProductPage = () => {
             </div>
 
             {/* Desktop: Description Image */}
-            {product.descriptionImage && (
+            {/* {product.descriptionImage && (
               <div className="hidden lg:block mt-6">
                 <img
                   src={product.descriptionImage}
@@ -337,7 +428,7 @@ const ProductPage = () => {
                   className="w-full rounded-2xl"
                 />
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Right - Product Info */}
@@ -370,19 +461,32 @@ const ProductPage = () => {
                 </span>
               </div>
               <div className="flex flex-wrap gap-2">
-                {colors.map((colorObj, i) => (
+                {colors.map((colorObj, i) => {
+                  const isSelected =
+                    colorObj.productId === product._id &&
+                    selection.hexCode === colorObj.hexCode;
+                  return (
                   <button
                     key={i}
                     onClick={() => handleColorSelect(colorObj)}
                     className={`relative w-11 h-11 rounded-full transition-all ${
-                      selection.hexCode === colorObj.hexCode
+                      isSelected
                         ? "ring-2 ring-blue-500 ring-offset-2 ring-offset-[#0a0f1a] scale-110"
                         : "hover:scale-105"
-                    }`}
+                    } ${colorObj.soldOut ? "opacity-40" : ""}`}
                     style={{ backgroundColor: colorObj.hexCode }}
-                    title={colorObj.name}
+                    title={colorObj.soldOut ? `${colorObj.name} (Sold out)` : colorObj.name}
                   >
-                    {selection.hexCode === colorObj.hexCode && (
+                    {colorObj.soldOut && (
+                      <span
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          background:
+                            "linear-gradient(to top right, transparent calc(50% - 1px), rgba(255,255,255,0.9) 50%, transparent calc(50% + 1px))",
+                        }}
+                      />
+                    )}
+                    {isSelected && (
                       <IoMdCheckmark
                         className={`absolute inset-0 m-auto ${
                           colorObj.hexCode.toLowerCase() === "#ffffff" ||
@@ -394,7 +498,8 @@ const ProductPage = () => {
                       />
                     )}
                   </button>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -426,7 +531,7 @@ const ProductPage = () => {
                     (v) =>
                       v.size === size &&
                       v.color === selection.hexCode &&
-                      v.units > 0
+                      v.units > 0,
                   );
                   const isSelected = selection.size === size;
 
@@ -441,8 +546,8 @@ const ProductPage = () => {
                         isSelected
                           ? "bg-white text-black"
                           : isAvailable
-                          ? "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
-                          : "bg-slate-900/50 text-slate-600 cursor-not-allowed line-through"
+                            ? "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
+                            : "bg-slate-900/50 text-slate-600 cursor-not-allowed line-through"
                       }`}
                     >
                       {size}
@@ -577,15 +682,15 @@ const ProductPage = () => {
         </div>
 
         {/* Mobile: Description Image */}
-        {product.descriptionImage && (
-          <div className="lg:hidden mt-8">
+        {/* {product.descriptionImage && (
+          <div className="md:hidden mt-8">
             <img
               src={product.descriptionImage}
               alt=""
               className="w-full rounded-2xl"
             />
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Image Preview Modal */}

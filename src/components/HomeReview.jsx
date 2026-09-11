@@ -37,7 +37,7 @@ const HomeReview = () => {
               ))}
             </div>
             <span className="text-white text-sm font-medium">
-              {review.rating}
+              {review.rating.toFixed(1)}
             </span>
           </div>
         </div>

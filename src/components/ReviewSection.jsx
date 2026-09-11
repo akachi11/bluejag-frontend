@@ -58,7 +58,7 @@ const ReviewsSection = ({ productId }) => {
         {
           params: { page: 1, limit: PREVIEW_LIMIT, sort: "recent" },
           headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
+        },
       );
 
       setReviews(res.data.reviews);
@@ -82,7 +82,7 @@ const ReviewsSection = ({ productId }) => {
         {
           params: { page: 1, limit: 100 }, // Get enough to find user's review
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       // Find user's review
@@ -102,7 +102,7 @@ const ReviewsSection = ({ productId }) => {
         }/api/reviews/can-review/${productId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       setCanReview(res.data.canReview);
       setOrderId(res.data.orderId);
@@ -126,7 +126,7 @@ const ReviewsSection = ({ productId }) => {
         { voteType },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       // Update reviews list
@@ -139,8 +139,8 @@ const ReviewsSection = ({ productId }) => {
                 downvotes: res.data.downvotes,
                 userVote: res.data.userVote,
               }
-            : review
-        )
+            : review,
+        ),
       );
 
       // Update user review if it's theirs
@@ -182,7 +182,7 @@ const ReviewsSection = ({ productId }) => {
         }/api/reviews/${userReview._id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       toast.success("Review deleted");
       setUserReview(null);
@@ -441,7 +441,7 @@ const ReviewCard = ({ review, onVote, loggedIn, isUserReview = false }) => {
         <div>
           <div className="flex items-center gap-3 mb-2">
             <span className="font-semibold">
-              {review.userId.firstName} {review.userId.lastName}
+              {review.userId?.firstName} {review.userId?.lastName}
             </span>
             {isUserReview && (
               <span className="bg-blue-900 text-blue-300 text-xs px-2 py-1 rounded">
@@ -478,7 +478,7 @@ const ReviewCard = ({ review, onVote, loggedIn, isUserReview = false }) => {
         <div className="mb-4">
           <span
             className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${getTTSColor(
-              review.ttsRating
+              review.ttsRating,
             )} bg-gray-800`}
           >
             Fit: {getTTSLabel(review.ttsRating)}
