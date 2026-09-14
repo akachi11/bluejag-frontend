@@ -15,6 +15,7 @@ export default function OrderDetails() {
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelEmail, setCancelEmail] = useState("");
 
   const userData = JSON.parse(localStorage.getItem("bj_userData"));
   const token = userData?.token;
@@ -44,31 +45,29 @@ export default function OrderDetails() {
     fetchOrder();
   }, [oid]);
 
-  const handleCancelOrder = async () => {
-    setCancelling(true);
-    try {
-      const res = await axios.put(
-        `${
-          location.origin.includes("localhost") ? localHost : renderAPI
-        }/api/order/${order._id}/cancel`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    const handleCancelOrder = async () => {
+        setCancelling(true);
+        try {
+            const res = await axios.put(
+                `${location.origin.includes("localhost") ? localHost : renderAPI}/api/order/${order._id}/cancel`,
+                order.owner ? {} : { email: cancelEmail }, // only send email for guest orders
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            setCancelling(false);
+            toast.success("Order cancelled");
+            setOrder((prev) => ({ ...prev, status: "cancelled" }));
+            setTimeout(() => {
+                navigate("/orders");
+            }, 2000);
+        } catch (err) {
+            setCancelling(false);
+            toast.error(err.response?.data?.message || "Failed to cancel order");
         }
-      );
-      setCancelling(false);
-      toast.success("Order cancelled");
-      setOrder((prev) => ({ ...prev, status: "cancelled" }));
-      setTimeout(() => {
-        navigate("/orders");
-      }, 2000);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to cancel order");
-    }
-  };
+    };
 
   if (loading) return <OrderDetailsSkeleton />;
 
@@ -227,49 +226,61 @@ export default function OrderDetails() {
         </div>
       )}
 
-      {/* Cancel Modal */}
-      {showCancelModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-[#0f172a] rounded-2xl shadow-2xl p-8 max-w-sm w-[90%]"
-          >
-            <h2 className="text-xl font-semibold mb-3 text-center">
-              Cancel Order?
-            </h2>
+        {showCancelModal && (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="bg-[#0f172a] rounded-2xl shadow-2xl p-8 max-w-sm w-[90%]"
+                >
+                    <h2 className="text-xl font-semibold mb-3 text-center">
+                        Cancel Order?
+                    </h2>
 
-            <p className="text-gray-400 text-sm text-center mb-6">
-              Are you sure you want to cancel this order? This action cannot be
-              undone.
-            </p>
+                    <p className="text-gray-400 text-sm text-center mb-6">
+                        Are you sure you want to cancel this order? This action cannot be undone.
+                    </p>
 
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={() => setShowCancelModal(false)}
-                className="px-5 py-2.5 rounded-lg bg-[#1e293b] hover:bg-[#334155] text-gray-200 text-sm font-semibold transition-all"
-              >
-                No, Keep It
-              </button>
+                    {!order.owner && (
+                        <div className="mb-6">
+                            <label className="block text-gray-400 text-sm mb-1.5">
+                                Confirm the email used for this order
+                            </label>
+                            <input
+                                type="email"
+                                value={cancelEmail}
+                                onChange={(e) => setCancelEmail(e.target.value)}
+                                placeholder="you@example.com"
+                                className="w-full p-2.5 rounded-lg bg-[#1e293b] text-white text-sm outline-none focus:ring-2 focus:ring-red-500/50"
+                            />
+                        </div>
+                    )}
 
-              <button
-                onClick={handleCancelOrder}
-                disabled={cancelling}
-                className={`${
-                  cancelling ? "bg-red-300" : ""
-                } px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-all`}
-              >
-                Yes, Cancel
-              </button>
+                    <div className="flex justify-center gap-4">
+                        <button
+                            onClick={() => setShowCancelModal(false)}
+                            className="px-5 py-2.5 rounded-lg bg-[#1e293b] hover:bg-[#334155] text-gray-200 text-sm font-semibold transition-all"
+                        >
+                            No, Keep It
+                        </button>
+
+                        <button
+                            onClick={handleCancelOrder}
+                            disabled={cancelling || (!order.owner && !cancelEmail)}
+                            className={`${
+                                cancelling || (!order.owner && !cancelEmail) ? "opacity-50 cursor-not-allowed" : ""
+                            } px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-all`}
+                        >
+                            Yes, Cancel
+                        </button>
+                    </div>
+
+                    <p className="text-gray-500 text-xs text-center mt-8 italic">
+                        Refunds for cancelled orders are processed within 8–14 working days.
+                    </p>
+                </motion.div>
             </div>
-
-            <p className="text-gray-500 text-xs text-center mt-8 italic">
-              Refunds for cancelled orders are processed within 8–14 working
-              days.
-            </p>
-          </motion.div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

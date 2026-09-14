@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import img from "../assets/Female/everyday.jpeg";
-import img1 from "../assets/Female/hard.jpeg";
+import img1 from "../assets/naza.JPG";
 import img2 from "../assets/Female/cute.jpeg";
 
 const WearsSlides = () => {
